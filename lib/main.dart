@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'chat_screen.dart';
+import 'scanner_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -54,7 +56,6 @@ class _MainScreenState extends State<MainScreen> {
       appBar: AppBar(
         title: Row(
           children: [
-            // Utilisation de la photo de groupe OIP.webp comme logo
             ClipRRect(
               borderRadius: BorderRadius.circular(8.0),
               child: Image.asset('assets/images/logo.webp', height: 35, width: 35, fit: BoxFit.cover),
@@ -85,46 +86,6 @@ class _MainScreenState extends State<MainScreen> {
             selectedIcon: Icon(Icons.camera_alt),
             label: 'Scanner',
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class ChatScreen extends StatelessWidget {
-  const ChatScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Icon(Icons.forum_outlined, size: 80, color: Colors.grey),
-          SizedBox(height: 20),
-          Text('Interface de discussion', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          SizedBox(height: 10),
-          Text('En attente de connexion à Firebase...'),
-        ],
-      ),
-    );
-  }
-}
-
-class ScannerScreen extends StatelessWidget {
-  const ScannerScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Icon(Icons.document_scanner_outlined, size: 80, color: Colors.grey),
-          SizedBox(height: 20),
-          Text('Scanner de présence', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          SizedBox(height: 10),
-          Text('En attente de configuration caméra...'),
         ],
       ),
     );
