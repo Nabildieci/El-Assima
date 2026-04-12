@@ -26,11 +26,13 @@ jobs:
           rm -rf ios
           flutter create --platforms=ios --project-name carte_nabil --org com.supportclub.carte .
 
-      - name: Inject iOS Permissions
+      - name: Inject iOS Permissions & Name
         run: |
+          /usr/libexec/PlistBuddy -c "Add :CFBundleDisplayName string 'ASSIMA-10'" ios/Runner/Info.plist || /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName 'ASSIMA-10'" ios/Runner/Info.plist
           /usr/libexec/PlistBuddy -c "Add :NSCameraUsageDescription string 'Autorisation requise pour scanner la carte de membre'" ios/Runner/Info.plist
           /usr/libexec/PlistBuddy -c "Add :NSLocalNetworkUsageDescription string 'Requis pour la connexion Firebase'" ios/Runner/Info.plist
-          /usr/libexec/PlistBuddy -c "Add :NSPhotoLibraryUsageDescription string 'Autorisation requise pour enregistrer les scans'" ios/Runner/Info.plist
+          /usr/libexec/PlistBuddy -c "Add :NSPhotoLibraryUsageDescription string 'Autorisation requise pour envoyer des photos et videos'" ios/Runner/Info.plist
+          /usr/libexec/PlistBuddy -c "Add :NSMicrophoneUsageDescription string 'Autorisation requise pour envoyer des messages vocaux'" ios/Runner/Info.plist
 
       - name: Get Dependencies
         run: |

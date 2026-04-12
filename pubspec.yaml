@@ -15,12 +15,20 @@ dependencies:
   firebase_core: ^2.28.0
   firebase_auth: ^4.17.6
   cloud_firestore: ^4.15.5
+  firebase_storage: ^11.6.0
   
   # Scanner dependencies
   camera: ^0.10.5+9
   google_mlkit_text_recognition: ^0.13.0
   path_provider: ^2.1.2
   shared_preferences: ^2.2.3
+
+  # Media dependencies
+  image_picker: ^1.1.0
+  record: ^5.0.5
+  audioplayers: ^5.2.1
+  video_player: ^2.8.5
+  permission_handler: ^11.3.1
 
 dev_dependencies:
   flutter_test:

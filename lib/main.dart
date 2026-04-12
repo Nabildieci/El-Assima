@@ -20,22 +20,49 @@ class ClubApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Club Supporters',
+      title: 'ASSIMA-10',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.blueAccent, // Couleur principale
-          brightness: Brightness.light,
+        colorScheme: const ColorScheme.light(
+          primary: Color(0xFFD32F2F), // Rouge USMA
+          onPrimary: Colors.white,
+          secondary: Colors.black,
+          surface: Colors.white,
+          onSurface: Colors.black,
         ),
+        scaffoldBackgroundColor: Colors.white,
         useMaterial3: true,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.black,
+          foregroundColor: Colors.white,
+          elevation: 0,
+        ),
+        navigationBarTheme: NavigationBarThemeData(
+          backgroundColor: Colors.white,
+          indicatorColor: Color(0x33D32F2F), // Translucent red
+        ),
       ),
       darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.blueAccent,
-          brightness: Brightness.dark,
+        colorScheme: const ColorScheme.dark(
+          primary: Color(0xFFD32F2F), // Rouge USMA
+          onPrimary: Colors.white,
+          secondary: Colors.grey,
+          surface: Color(0xFF121212),
+          onSurface: Colors.white,
         ),
+        scaffoldBackgroundColor: const Color(0xFF121212),
         useMaterial3: true,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.black,
+          foregroundColor: Colors.white,
+          elevation: 0,
+        ),
+        navigationBarTheme: NavigationBarThemeData(
+          backgroundColor: Colors.black,
+          indicatorColor: Color(0x33D32F2F),
+        ),
       ),
+      themeMode: ThemeMode.system,
       home: const MainScreen(),
     );
   }
@@ -64,13 +91,16 @@ class _MainScreenState extends State<MainScreen> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(8.0),
-              child: Image.asset('assets/images/logo.webp', height: 35, width: 35, fit: BoxFit.cover),
+              child: Container(
+                color: Colors.white,
+                padding: const EdgeInsets.all(2),
+                child: Image.asset('assets/images/logo.webp', height: 31, width: 31, fit: BoxFit.cover),
+              ),
             ),
             const SizedBox(width: 12),
-            const Text('Supporters', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text('ASSIMA-10', style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.5)),
           ],
         ),
-        backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
         elevation: 0,
       ),
       body: _pages[_currentIndex],
