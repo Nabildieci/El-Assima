@@ -1,0 +1,52 @@
+name: CarteNabil-iOS-Build-IPA
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.0'
+          channel: 'stable'
+
+      - name: Recreate iOS Folder
+        run: |
+          rm -rf ios
+          flutter create --platforms=ios --project-name carte_nabil --org com.supportclub.carte .
+
+      - name: Inject iOS Permissions
+        run: |
+          /usr/libexec/PlistBuddy -c "Add :NSCameraUsageDescription string 'Autorisation requise pour scanner la carte de membre'" ios/Runner/Info.plist
+          /usr/libexec/PlistBuddy -c "Add :NSLocalNetworkUsageDescription string 'Requis pour la connexion Firebase'" ios/Runner/Info.plist
+          /usr/libexec/PlistBuddy -c "Add :NSPhotoLibraryUsageDescription string 'Autorisation requise pour enregistrer les scans'" ios/Runner/Info.plist
+
+      - name: Get Dependencies
+        run: |
+          flutter config --enable-ios
+          flutter pub get
+
+      - name: Build iOS IPA
+        run: |
+          flutter build ios --release --no-codesign
+          cd build/ios/iphoneos
+          mkdir -p Payload
+          cp -r Runner.app Payload/
+          zip -r CARTE_NABIL.ipa Payload
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: CarteNabil-iOS-IPA
+          path: build/ios/iphoneos/CARTE_NABIL.ipa
