@@ -1,4 +1,4 @@
-# Trigger Build Final v3
+# Trigger Build Final v5
 name: CarteNabil-Android-Build-APK-Final
 
 on:
@@ -29,129 +29,39 @@ jobs:
           flutter-version: '3.24.3'
           channel: 'stable'
 
-      - name: Create Android Native Folders
+      - name: Re-Generate Android Project
         run: |
-          flutter create --org com.supportclub.carte --project-name carte_nabil . --platforms=android --no-overwrite
+          # On supprime le dossier android pour etre sur de repartir a zero
+          rm -rf android
+          flutter create --org com.supportclub.carte --project-name carte_nabil . --platforms=android
 
-      - name: Configure Android Build (Hardened R8 Fix)
+      - name: Patch Android Configuration
         run: |
-          # 1. Patch settings.gradle
-          cat > android/settings.gradle <<EOF
-          pluginManagement {
-              def flutterSdkPath = {
-                  def properties = new Properties()
-                  file("local.properties").withInputStream { properties.load(it) }
-                  def flutterSdkPath = properties.getProperty("flutter.sdk")
-                  if (flutterSdkPath == null) throw new GradleException("flutter.sdk not set in local.properties")
-                  return flutterSdkPath
-              }()
+          # 1. Patch settings.gradle (Force Kotlin 1.9.24 and Google Services)
+          sed -i 's/id "org.jetbrains.kotlin.android" version "[^"]*"/id "org.jetbrains.kotlin.android" version "1.9.24" apply false/g' android/settings.gradle
+          sed -i '/plugins {/a \    id "com.google.gms.google-services" version "4.4.1" apply false' android/settings.gradle
 
-              includeBuild("\$flutterSdkPath/packages/flutter_tools/gradle")
+          # 2. Patch root build.gradle (Force R8 8.3.37)
+          sed -i '/dependencies {/a \        classpath "com.android.tools:r8:8.3.37"' android/build.gradle
 
-              repositories {
-                  google()
-                  mavenCentral()
-                  gradlePluginPortal()
-              }
-          }
-
-          plugins {
-              id "dev.flutter.flutter-gradle-plugin" version "1.0.0" apply false
-              id "com.android.application" version "8.2.1" apply false
-              id "org.jetbrains.kotlin.android" version "1.9.24" apply false
-              id "com.google.gms.google-services" version "4.4.1" apply false
-          }
-
-          include ":app"
-          EOF
-
-          # 2. Patch root build.gradle - FORCE R8 VERSION
-          cat > android/build.gradle <<EOF
-          buildscript {
-              repositories {
-                  google()
-                  mavenCentral()
-              }
-              dependencies {
-                  // FORCE R8 8.3.37 to support Sealed Classes / Kotlin 1.9
-                  classpath 'com.android.tools:r8:8.3.37'
-              }
-          }
-
-          allprojects {
-              repositories {
-                  google()
-                  mavenCentral()
-              }
-          }
-
-          rootProject.buildDir = '../build'
-          subprojects {
-              project.buildDir = "\${rootProject.buildDir}/\${project.name}"
-              project.evaluationDependsOn(':app')
-          }
-
-          tasks.register("clean", Delete) {
-              delete rootProject.buildDir
-          }
-          EOF
-
-          # 3. Patch app/build.gradle
-          cat > android/app/build.gradle <<EOF
-          plugins {
-              id "com.android.application"
-              id "org.jetbrains.kotlin.android"
-              id "dev.flutter.flutter-gradle-plugin"
-              id "com.google.gms.google-services"
-          }
-
-          android {
-              namespace = "com.supportclub.carte"
-              compileSdk = 34
-
-              defaultConfig {
-                  applicationId = "com.supportclub.carte"
-                  minSdk = 24
-                  targetSdk = 34
-                  versionCode = 1
-                  versionName = "1.0.0"
-              }
-
-              compileOptions {
-                  sourceCompatibility JavaVersion.VERSION_17
-                  targetCompatibility JavaVersion.VERSION_17
-              }
-
-              kotlinOptions {
-                  jvmTarget = "17"
-              }
-
-              buildTypes {
-                  release {
-                      signingConfig = signingConfigs.debug
-                      minifyEnabled = false
-                      shrinkResources = false
-                  }
-              }
-          }
-
-          flutter {
-              source = "../.."
-          }
-          EOF
-
-          # Force clean MainActivity.kt in the CORRECT package folder
-          mkdir -p android/app/src/main/kotlin/com/supportclub/carte
-          cat > android/app/src/main/kotlin/com/supportclub/carte/MainActivity.kt <<EOF
-          package com.supportclub.carte
-          import io.flutter.embedding.android.FlutterActivity
-          class MainActivity: FlutterActivity() {
-          }
-          EOF
-          # Remove potential duplicates
-          rm -rf android/app/src/main/kotlin/com/supportclub/carte/carte_nabil
+          # 3. Patch app/build.gradle (ApplicationId, Namespace, Java 17, Google Services)
+          # On ajoute le plugin google-services
+          sed -i '/id "dev.flutter.flutter-gradle-plugin"/a \    id "com.google.gms.google-services"' android/app/build.gradle
           
-          # Fix manifest label
+          # Fix ApplicationId & Namespace (parfois flutter create met des valeurs differentes)
+          sed -i 's/applicationId = .*/applicationId = "com.supportclub.carte"/g' android/app/build.gradle
+          sed -i 's/namespace = .*/namespace = "com.supportclub.carte"/g' android/app/build.gradle
+          
+          # Fix SDKs
+          sed -i 's/minSdk = .*/minSdk = 24/g' android/app/build.gradle
+          sed -i 's/targetSdk = .*/targetSdk = 34/g' android/app/build.gradle
+          
+          # Fix Java 17 / JVM Target
+          # On cherche compileOptions et on remplace
+          sed -i '/compileOptions {/,/}/c \    compileOptions {\n        sourceCompatibility JavaVersion.VERSION_17\n        targetCompatibility JavaVersion.VERSION_17\n    }' android/app/build.gradle
+          sed -i '/kotlinOptions {/,/}/c \    kotlinOptions {\n        jvmTarget = "17"\n    }' android/app/build.gradle
+
+          # 4. Finalizing manifest
           sed -i 's/android:label=".*"/android:label="ASSIMA-10"/' android/app/src/main/AndroidManifest.xml
 
       - name: Inject Google Services JSON
