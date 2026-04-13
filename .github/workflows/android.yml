@@ -30,10 +30,13 @@ jobs:
       - name: Create Android Native Folders
         run: flutter create --org com.supportclub.carte --project-name carte_nabil . --platforms=android --no-overwrite
 
-      - name: Fix Kotlin Version
+      - name: Fix Kotlin & R8 Versions
         run: |
-          sed -i -E 's/ext\.kotlin_version = .*/ext.kotlin_version = "1.9.22"/g' android/build.gradle || true
-          sed -i -E 's/org\.jetbrains\.kotlin\.android" version ".*" apply false/org.jetbrains.kotlin.android" version "1.9.22" apply false/g' android/settings.gradle || true
+          # Force nouveau R8 shrinker
+          sed -i '1i pluginManagement { buildscript { repositories { mavenCentral(); google() } dependencies { classpath("com.android.tools:r8:8.2.33") } } }' android/settings.gradle
+          # Force Kotlin 1.9.24
+          sed -i 's/version "1.7.10" apply false/version "1.9.24" apply false/g' android/settings.gradle || true
+          sed -i 's/version "1.8.22" apply false/version "1.9.24" apply false/g' android/settings.gradle || true
 
       - name: Add Android Permissions
         run: |
@@ -56,7 +59,7 @@ jobs:
         run: flutter pub get
 
       - name: Build APK Release
-        run: flutter build apk --release --no-shrink
+        run: flutter build apk --release
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
