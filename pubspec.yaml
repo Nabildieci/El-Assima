@@ -25,7 +25,7 @@ dependencies:
 
   # Media dependencies
   image_picker: ^1.1.0
-  record: ^6.0.0
+  record: ^5.0.5
   audioplayers: ^5.2.1
   video_player: ^2.8.5
   permission_handler: ^11.3.1
