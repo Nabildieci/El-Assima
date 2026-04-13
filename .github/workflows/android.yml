@@ -32,13 +32,42 @@ jobs:
 
       - name: Fix Kotlin & R8 Versions
         run: |
-          # Inject R8 dependency at the start of the root build.gradle safely
-          echo "buildscript { repositories { google(); mavenCentral() }; dependencies { classpath \"com.android.tools:r8:8.3.37\" } }" > r8_fix.gradle
-          cat r8_fix.gradle android/build.gradle > android/build.gradle.new && mv android/build.gradle.new android/build.gradle
-          # Force Kotlin 1.9.24 ONLY for the kotlin plugin in settings.gradle
+          # Overwrite root build.gradle with correct versions
+          cat > android/build.gradle <<EOF
+buildscript {
+    ext.kotlin_version = '1.9.24'
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.2.1'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:\$kotlin_version"
+        classpath 'com.android.tools:r8:8.3.37'
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.buildDir = '../build'
+subprojects {
+    project.buildDir = "\${rootProject.buildDir}/\${project.name}"
+}
+subprojects {
+    project.evaluationDependsOn(':app')
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}
+EOF
+          # Update Kotlin version in settings.gradle too
           sed -i 's/id "org.jetbrains.kotlin.android" version "[^"]*"/id "org.jetbrains.kotlin.android" version "1.9.24"/g' android/settings.gradle || true
-          # Force Kotlin 1.9.24 in build.gradle if present
-          sed -i 's/ext.kotlin_version = .*/ext.kotlin_version = "1.9.24"/g' android/build.gradle || true
 
       - name: Add Android Permissions
         run: |
