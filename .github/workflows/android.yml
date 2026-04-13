@@ -140,6 +140,20 @@ jobs:
           }
           EOF
 
+          # Force clean MainActivity.kt in the CORRECT package folder
+          mkdir -p android/app/src/main/kotlin/com/supportclub/carte
+          cat > android/app/src/main/kotlin/com/supportclub/carte/MainActivity.kt <<EOF
+          package com.supportclub.carte
+          import io.flutter.embedding.android.FlutterActivity
+          class MainActivity: FlutterActivity() {
+          }
+          EOF
+          # Remove potential duplicates
+          rm -rf android/app/src/main/kotlin/com/supportclub/carte/carte_nabil
+          
+          # Fix manifest label
+          sed -i 's/android:label=".*"/android:label="ASSIMA-10"/' android/app/src/main/AndroidManifest.xml
+
       - name: Inject Google Services JSON
         run: |
           if [ -n "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" ]; then
