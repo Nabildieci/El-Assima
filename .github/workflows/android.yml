@@ -44,7 +44,6 @@ jobs:
               dependencies {
                   classpath 'com.android.tools.build:gradle:8.2.1'
                   classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:\$kotlin_version"
-                  classpath 'com.android.tools:r8:8.3.37'
                   classpath 'com.google.gms:google-services:4.4.1'
               }
           }
@@ -59,8 +58,6 @@ jobs:
           rootProject.buildDir = '../build'
           subprojects {
               project.buildDir = "\${rootProject.buildDir}/\${project.name}"
-          }
-          subprojects {
               project.evaluationDependsOn(':app')
           }
 
@@ -68,8 +65,9 @@ jobs:
               delete rootProject.buildDir
           }
           EOF
-          # Correction de la version Kotlin dans settings.gradle
-          sed -i 's/id "org.jetbrains.kotlin.android" version "[^"]*"/id "org.jetbrains.kotlin.android" version "1.9.24"/g' android/settings.gradle || true
+          
+          # Correction cruciale pour Kotlin 1.9+ dans settings.gradle
+          sed -i 's/id "org.jetbrains.kotlin.android" version "[^"]*"/id "org.jetbrains.kotlin.android" version "1.9.24" apply false/g' android/settings.gradle || true
 
       - name: Inject Google Services JSON
         run: |
@@ -124,7 +122,7 @@ jobs:
       - name: Build APK Release
         run: |
           flutter pub get
-          flutter build apk --release --target-platform android-arm64 --split-per-abi
+          flutter build apk --release --no-shrink --target-platform android-arm64 --split-per-abi
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
