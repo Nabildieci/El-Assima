@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "911900427556",
+    "project_id": "elite-by-s",
+    "storage_bucket": "elite-by-s.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:911900427556:android:48b3d6dcd96cc0e1b51fb1",
+        "android_client_info": {
+          "package_name": "com.supportclub.carte"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyALftq8qXtQALSE3U1Eq-weKUdd5olykA8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -45,6 +45,7 @@ jobs:
                   classpath 'com.android.tools.build:gradle:8.2.1'
                   classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:\$kotlin_version"
                   classpath 'com.android.tools:r8:8.3.37'
+                  classpath 'com.google.gms:google-services:4.4.1'
               }
           }
 
@@ -70,6 +71,15 @@ jobs:
           # Correction de la version Kotlin dans settings.gradle
           sed -i 's/id "org.jetbrains.kotlin.android" version "[^"]*"/id "org.jetbrains.kotlin.android" version "1.9.24"/g' android/settings.gradle || true
 
+      - name: Inject Google Services JSON
+        run: |
+          # On injecte le secret BASE64 dans le fichier (si disponible)
+          if [ -n "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" ]; then
+            echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > android/app/google-services.json
+          else
+            echo "Warning: GOOGLE_SERVICES_JSON_BASE64 secret not found. Build may fail if Firebase is used."
+          fi
+
       - name: Set Release Permissions & App Name
         run: |
           # Correction du Package Name
@@ -85,15 +95,24 @@ jobs:
           sed -i 's/<application/<application android:usesCleartextTraffic="true"/' android/app/src/main/AndroidManifest.xml
           sed -i 's/android:label=".*"/android:label="ASSIMA-10"/' android/app/src/main/AndroidManifest.xml
 
-      - name: Finalize SDK Versions
+      - name: Finalize SDK Versions & Plugins
         run: |
           # On force le Min SDK à 23 pour la compatibilité NDI/Camera
           sed -i 's/minSdkVersion .*/minSdkVersion 23/g' android/app/build.gradle
-          # On s'assure que le Target SDK est à 34 (Standard Google Play 2024+)
+          sed -i 's/flutter.minSdkVersion/23/g' android/app/build.gradle
+          # Nettoyage agresif du Manifest (supprime tout minSdkVersion persistant)
+          sed -i '/android:minSdkVersion="[0-9]*"/d' android/app/src/main/AndroidManifest.xml
+
+          # On s'assure que le Target SDK est à 34
           if grep -q "targetSdkVersion" android/app/build.gradle; then
             sed -i 's/targetSdkVersion .*/targetSdkVersion 34/g' android/app/build.gradle
           else
             sed -i '/defaultConfig {/a \        targetSdkVersion 34' android/app/build.gradle
+          fi
+
+          # Application du plugin Google Services
+          if ! grep -q "com.google.gms.google-services" android/app/build.gradle; then
+            echo "apply plugin: 'com.google.gms.google-services'" >> android/app/build.gradle
           fi
 
       - name: Build APK Release
