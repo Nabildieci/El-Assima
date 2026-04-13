@@ -32,11 +32,12 @@ jobs:
 
       - name: Fix Kotlin & R8 Versions
         run: |
-          # The pluginManagement block is already created by 'flutter create'
-          # We should not prepend a new one. Instead, we can add the buildscript dependency inside if needed.
-          # For now, let's just fix the Kotlin version which is safer.
-          sed -i 's/version "1.7.10" apply false/version "1.9.24" apply false/g' android/settings.gradle || true
-          sed -i 's/version "1.8.22" apply false/version "1.9.24" apply false/g' android/settings.gradle || true
+          # Inject R8 dependency inside the existing pluginManagement block
+          sed -i '/pluginManagement {/a \    buildscript { repositories { mavenCentral(); google() } dependencies { classpath("com.android.tools:r8:8.3.37") } }' android/settings.gradle
+          # Force Kotlin 1.9.24 in settings.gradle
+          sed -i 's/version ".*" apply false/version "1.9.24" apply false/g' android/settings.gradle || true
+          # Force Kotlin 1.9.24 in app build.gradle if present
+          sed -i 's/ext.kotlin_version = .*/ext.kotlin_version = "1.9.24"/g' android/build.gradle || true
 
       - name: Add Android Permissions
         run: |
