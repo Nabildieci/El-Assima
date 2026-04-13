@@ -24,98 +24,56 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.0'
+          flutter-version: '3.24.3'
           channel: 'stable'
 
       - name: Create Android Native Folders
         run: |
-          # On s'assure que le projet est propre
-          flutter create --org com.supportclub.carte --project-name carte_nabil . --platforms=android --no-overwrite
-
-      - name: Configure Android Build (Gradle & Kotlin)
-        run: |
-          cat > android/build.gradle <<EOF
-          buildscript {
-              ext.kotlin_version = '1.9.24'
-              repositories {
-                  google()
-                  mavenCentral()
-              }
-              dependencies {
-                  classpath 'com.android.tools.build:gradle:8.2.1'
-                  classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:\$kotlin_version"
-                  classpath 'com.google.gms:google-services:4.4.1'
-              }
-          }
-
-          allprojects {
-              repositories {
-                  google()
-                  mavenCentral()
-              }
-          }
-
-          rootProject.buildDir = '../build'
-          subprojects {
-              project.buildDir = "\${rootProject.buildDir}/\${project.name}"
-              project.evaluationDependsOn(':app')
-          }
-
-          tasks.register("clean", Delete) {
-              delete rootProject.buildDir
-          }
-          EOF
-          
-          # Correction cruciale pour Kotlin 1.9+ dans settings.gradle
-          sed -i 's/id "org.jetbrains.kotlin.android" version "[^"]*"/id "org.jetbrains.kotlin.android" version "1.9.24" apply false/g' android/settings.gradle || true
+          flutter create --org com.supportclub --project-name carte_nabil . --platforms=android --no-overwrite
 
       - name: Inject Google Services JSON
         run: |
-          # On injecte le secret BASE64 dans le fichier (si disponible)
           if [ -n "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" ]; then
             echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > android/app/google-services.json
           else
-            echo "Warning: GOOGLE_SERVICES_JSON_BASE64 secret not found. Build may fail if Firebase is used."
+            echo "Warning: GOOGLE_SERVICES_JSON_BASE64 secret not found."
           fi
 
       - name: Set Release Permissions & App Name
         run: |
           # Correction du Package Name
           sed -i 's/package=".*"/package="com.supportclub.carte"/' android/app/src/main/AndroidManifest.xml
-          
           # Nettoyage des anciennes permissions pour éviter les doublons avant injection
           sed -i '/<uses-permission/d' android/app/src/main/AndroidManifest.xml
-          
-          # Injection propre des permissions après le tag manifest
+          # Injection propre des permissions
           sed -i '/<manifest/a \    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />\n    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />\n    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />\n    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />\n    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />' android/app/src/main/AndroidManifest.xml
-          
-          # Configuration Application : Cleartext et Label Final
-          sed -i 's/<application/<application android:usesCleartextTraffic="true"/' android/app/src/main/AndroidManifest.xml
+          # Application label
           sed -i 's/android:label=".*"/android:label="ASSIMA-10"/' android/app/src/main/AndroidManifest.xml
 
       - name: Patch Android App Build Config
         run: |
-          # 1. Forcer le Namespace (Regex pour ignorer les espaces et le = éventuel)
+          # 1. Forcer Namespace + ApplicationId (Regex tolerante aux espaces et =)
           sed -i -E 's/namespace[[:space:]]*=?[[:space:]]*".*"/namespace = "com.supportclub.carte"/g' android/app/build.gradle
-          
-          # 2. Forcer l'Application ID pour Firebase
           sed -i -E 's/applicationId[[:space:]]*=?[[:space:]]*".*"/applicationId = "com.supportclub.carte"/g' android/app/build.gradle
-          
-          # 3. Forcer le minSdk à 23 (Prend en compte 'minSdk' ou 'minSdkVersion')
+
+          # 2. Forcer minSdk à 23
           sed -i -E 's/minSdk[A-Za-z]*[[:space:]]*=?[[:space:]]*.*/minSdk = 23/g' android/app/build.gradle
-          
-          # 4. Forcer le targetSdk à 34
+
+          # 3. Forcer targetSdk à 34
           sed -i -E 's/targetSdk[A-Za-z]*[[:space:]]*=?[[:space:]]*.*/targetSdk = 34/g' android/app/build.gradle
-          
-          # 5. Injection du plugin Google Services à la toute fin du fichier
+
+          # 4. Ajouter les plugins Google Services
+          if ! grep -q "com.google.gms:google-services" android/build.gradle 2>/dev/null; then
+            sed -i '/dependencies {/a \        classpath '\''com.google.gms:google-services:4.4.1'\''' android/build.gradle 2>/dev/null || true
+          fi
           if ! grep -q "com.google.gms.google-services" android/app/build.gradle; then
             echo "apply plugin: 'com.google.gms.google-services'" >> android/app/build.gradle
           fi
 
-          # Nettoyage agressif du Manifest (supprime tout minSdkVersion persistant qui pourrait bloquer le merger)
+          # 5. Nettoyage agressif du Manifest
           sed -i '/android:minSdkVersion="[0-9]*"/d' android/app/src/main/AndroidManifest.xml
 
-          # Vérification rapide dans les logs de l'Action
+          # Vérification
           echo "--- VERIFICATION BUILD.GRADLE ---"
           grep -E "namespace|applicationId|minSdk|targetSdk" android/app/build.gradle
 
@@ -128,4 +86,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ASSIMA-10-Final-APK
-          path: build/app/outputs/flutter-apk/app-release-arm64-v8a-release.apk
+          path: build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
