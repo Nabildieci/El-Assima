@@ -95,35 +95,31 @@ jobs:
           sed -i 's/<application/<application android:usesCleartextTraffic="true"/' android/app/src/main/AndroidManifest.xml
           sed -i 's/android:label=".*"/android:label="ASSIMA-10"/' android/app/src/main/AndroidManifest.xml
 
-      - name: Finalize SDK Versions & Plugins
+      - name: Patch Android App Build Config
         run: |
-          # On force le Min SDK à 23 pour la compatibilité NDI/Camera
-          sed -i 's/minSdkVersion .*/minSdkVersion 23/g' android/app/build.gradle
-          sed -i 's/flutter.minSdkVersion/23/g' android/app/build.gradle
-          # Nettoyage agresif du Manifest (supprime tout minSdkVersion persistant)
-          sed -i '/android:minSdkVersion="[0-9]*"/d' android/app/src/main/AndroidManifest.xml
-
-          # On s'assure que le Target SDK est à 34
-          if grep -q "targetSdkVersion" android/app/build.gradle; then
-            sed -i 's/targetSdkVersion .*/targetSdkVersion 34/g' android/app/build.gradle
-          else
-            sed -i '/defaultConfig {/a \        targetSdkVersion 34' android/app/build.gradle
-          fi
-
-          # Application du plugin Google Services
+          # 1. Forcer le Namespace (Regex pour ignorer les espaces et le = éventuel)
+          sed -i -E 's/namespace[[:space:]]*=?[[:space:]]*".*"/namespace = "com.supportclub.carte"/g' android/app/build.gradle
+          
+          # 2. Forcer l'Application ID pour Firebase
+          sed -i -E 's/applicationId[[:space:]]*=?[[:space:]]*".*"/applicationId = "com.supportclub.carte"/g' android/app/build.gradle
+          
+          # 3. Forcer le minSdk à 23 (Prend en compte 'minSdk' ou 'minSdkVersion')
+          sed -i -E 's/minSdk[A-Za-z]*[[:space:]]*=?[[:space:]]*.*/minSdk = 23/g' android/app/build.gradle
+          
+          # 4. Forcer le targetSdk à 34
+          sed -i -E 's/targetSdk[A-Za-z]*[[:space:]]*=?[[:space:]]*.*/targetSdk = 34/g' android/app/build.gradle
+          
+          # 5. Injection du plugin Google Services à la toute fin du fichier
           if ! grep -q "com.google.gms.google-services" android/app/build.gradle; then
             echo "apply plugin: 'com.google.gms.google-services'" >> android/app/build.gradle
           fi
 
-      - name: Match Package Name with Firebase
-        run: |
-          # Correction radicale de l'ID d'application pour correspondre à Firebase
-          sed -i 's/applicationId .*/applicationId "com.supportclub.carte"/' android/app/build.gradle
-          sed -i 's/namespace .*/namespace "com.supportclub.carte"/' android/app/build.gradle
-          # Vérification console
-          echo "Verification des ID dans build.gradle :"
-          grep "applicationId" android/app/build.gradle
-          grep "namespace" android/app/build.gradle
+          # Nettoyage agressif du Manifest (supprime tout minSdkVersion persistant qui pourrait bloquer le merger)
+          sed -i '/android:minSdkVersion="[0-9]*"/d' android/app/src/main/AndroidManifest.xml
+
+          # Vérification rapide dans les logs de l'Action
+          echo "--- VERIFICATION BUILD.GRADLE ---"
+          grep -E "namespace|applicationId|minSdk|targetSdk" android/app/build.gradle
 
       - name: Build APK Release
         run: |
