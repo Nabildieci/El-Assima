@@ -19,63 +19,32 @@ jobs:
           flutter-version: '3.24.3'
           channel: 'stable'
 
-      - name: Restore Platforms & Prep Build
+      - name: Install CocoaPods
         run: |
-          # Regénère le dossier ios/ s'il manque (Rescue mode)
-          if [ ! -d "ios" ]; then
-            echo "⚠️ ios/ dossier manquant. Restauration..."
-            flutter create --platforms=ios .
-          fi
+          sudo gem install cocoapods
+          pod --version
 
-          flutter config --no-analytics
+      - name: Install dependencies
+        run: |
+          flutter clean
           flutter pub get
 
-          # Definitive Podfile Generation (Fix Propre: String flags)
-          ruby -e 'File.write("ios/Podfile", <<~"PODFILE"
-            platform :ios, "13.0"
-            ENV["COCOAPODS_DISABLE_STATS"] = "true"
-            project "Runner", {
-              "Debug" => :debug,
-              "Profile" => :release,
-              "Release" => :release,
-            }
-            def flutter_root
-              generated_xcode_build_settings_path = File.expand_path(File.join("..", "Flutter", "Generated.xcconfig"), __FILE__)
-              File.foreach(generated_xcode_build_settings_path) do |line|
-                matches = line.match(/FLUTTER_ROOT=(.*)/)
-                return matches[1].strip if matches
-              end
-              raise "FLUTTER_ROOT not found"
-            end
-            require File.expand_path(File.join(flutter_root, "packages", "flutter_tools", "bin", "podhelper"))
-            flutter_ios_podfile_setup
-            target "Runner" do
-              use_frameworks!
-              use_modular_headers!
-              flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
-            end
-            post_install do |installer|
-              installer.pods_project.targets.each do |target|
-                flutter_additional_ios_build_settings(target)
-                target.build_configurations.each do |config|
-                  config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "13.0"
-                  # ✅ FIX PROPRE: Utilisation de Strings uniquement (évite la corruption des flags)
-                  config.build_settings["OTHER_CFLAGS"] = "$(inherited)"
-                  config.build_settings["OTHER_CPLUSPLUSFLAGS"] = "$(inherited)"
-                  config.build_settings["OTHER_LDFLAGS"] = "$(inherited)"
-                end
-              end
-            end
-          PODFILE
-          )'
-          cd ios && pod install && cd ..
-          # Debug: Vérification de l'injection du flag -G
-          echo "🔍 Vérification des flags -G..."
-          grep -R "\-G" ios --include="*.xcconfig" --include="*.pbxproj" || echo "✅ Aucun flag -G détecté"
-
-      - name: Build iOS (No Codesign)
+      - name: Install iOS pods
         run: |
-          flutter build ios --release --no-codesign
+          cd ios
+          pod repo update
+          pod install
+          cd ..
+
+      - name: Verify iOS project
+        run: |
+          if [ ! -f ios/Runner.xcodeproj/project.pbxproj ]; then
+            echo "iOS project missing!"
+            exit 1
+          fi
+
+      - name: Build iOS
+        run: flutter build ios --release --no-codesign
 
       - name: Upload iOS App Bundle
         uses: actions/upload-artifact@v4
