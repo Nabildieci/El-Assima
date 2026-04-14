@@ -19,7 +19,9 @@ class _ScannerScreenState extends State<ScannerScreen> {
   bool _isCameraInitialized = false;
   bool _isScanning = false;
   bool _showSuccessOverlay = false;
+  bool _showErrorOverlay = false;
   String _scanResult = "Placez la carte dans l'objectif et lancez l'analyse.";
+
 
   
   List<CameraDescription> _cameras = [];
@@ -195,7 +197,12 @@ class _ScannerScreenState extends State<ScannerScreen> {
       } else {
         if (mounted) {
           setState(() {
+            _showErrorOverlay = true;
             _scanResult = "❌ Membre non trouvé dans la base.\nScan: $rawData";
+          });
+          
+          Future.delayed(const Duration(seconds: 1), () {
+            if (mounted) setState(() => _showErrorOverlay = false);
           });
         }
       }
@@ -250,6 +257,15 @@ class _ScannerScreenState extends State<ScannerScreen> {
                       color: Colors.green.withOpacity(0.4),
                       child: const Center(
                         child: Icon(Icons.check_circle, color: Colors.white, size: 100),
+                      ),
+                    ),
+                  ),
+                if (_showErrorOverlay)
+                  Positioned.fill(
+                    child: Container(
+                      color: Colors.red.withOpacity(0.4),
+                      child: const Center(
+                        child: Icon(Icons.cancel, color: Colors.white, size: 100),
                       ),
                     ),
                   ),
