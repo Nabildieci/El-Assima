@@ -17,6 +17,38 @@ class _MembersListScreenState extends State<MembersListScreen> {
     super.initState();
   }
 
+  Future<void> _resetAttendance() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Réinitialiser ?"),
+        content: const Text("Voulez-vous marquer tous les membres comme ABSENTS pour une nouvelle session ?"),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("ANNULER")),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text("OUI, RÉINITIALISER", style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      final snapshot = await FirebaseFirestore.instance.collection('members').get();
+      final batch = FirebaseFirestore.instance.batch();
+      for (var doc in snapshot.docs) {
+        batch.update(doc.reference, {'is_present': false});
+      }
+      await batch.commit();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Liste réinitialisée avec succès !")),
+        );
+      }
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -31,6 +63,11 @@ class _MembersListScreenState extends State<MembersListScreen> {
               const Text(
                 "LISTE DES MEMBRES",
                 style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              IconButton(
+                icon: const Icon(Icons.refresh, color: Colors.white),
+                tooltip: "Réinitialiser la liste",
+                onPressed: _resetAttendance,
               ),
               DropdownButton<int>(
                 value: _selectedZone,
