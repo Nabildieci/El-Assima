@@ -13,12 +13,12 @@ class DataManager {
       'zone': 14,
     }, SetOptions(merge: true));
 
-    // Seed Nabil
+    // Seed Nabil (Updated from Card Photo)
     await collection.doc('ac010').set({
-      'name': 'Lafri Nabil',
-      'cardId': 'ac010',
+      'name': 'Lafri Nabil Riad',
+      'cardId': 'AC010',
       'is_present': false,
-      'matricule': 'ac010',
+      'matricule': 'AC010',
       'zone': 14,
     }, SetOptions(merge: true));
     
