@@ -22,6 +22,7 @@ jobs:
       - name: Regenerate Platforms
         run: |
           flutter clean
+          rm -rf ios/Pods ios/Podfile.lock
           flutter create --project-name=carte_nabil --platforms=ios,web,android .
           flutter pub get
           # Ensure camera permissions are added to Info.plist
@@ -29,19 +30,16 @@ jobs:
           if [ -f ios/Runner/Info.plist ]; then
             ruby -i -pe 'gsub(/<dict>/, "<dict>\n<key>NSCameraUsageDescription</key>\n<string>Scan de cartes de membres</string>\n<key>NSMicrophoneUsageDescription</key>\n<string>Utilisation du micro pour le scanner</string>")' ios/Runner/Info.plist
           fi
-          # Force iOS 13.0 and Clean Flags by overwriting Podfile entirely (UNCONDITIONAL)
+          # Force iOS 13.0 and Clean Flags by overwriting Podfile entirely (ULTRA-AGGRESSIVE)
           mkdir -p ios
           ruby -e 'File.write("ios/Podfile", <<~"PODFILE"
             platform :ios, "13.0"
-
             ENV["COCOAPODS_DISABLE_STATS"] = "true"
-
             project "Runner", {
               "Debug" => :debug,
               "Profile" => :release,
               "Release" => :release,
             }
-
             def flutter_root
               generated_xcode_build_settings_path = File.expand_path(File.join("..", "Flutter", "Generated.xcconfig"), __FILE__)
               File.foreach(generated_xcode_build_settings_path) do |line|
@@ -50,30 +48,38 @@ jobs:
               end
               raise "FLUTTER_ROOT not found"
             end
-
             require File.expand_path(File.join(flutter_root, "packages", "flutter_tools", "bin", "podhelper"))
-
             flutter_ios_podfile_setup
-
             target "Runner" do
               use_frameworks!
               use_modular_headers!
               flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
             end
-
             post_install do |installer|
               installer.pods_project.targets.each do |target|
                 flutter_additional_ios_build_settings(target)
-
                 target.build_configurations.each do |config|
-                  config.build_settings["OTHER_CFLAGS"] = ["$(inherited)"]
-                  config.build_settings["OTHER_CPLUSPLUSFLAGS"] = ["$(inherited)"]
+                  # 🔥 Nettoyage COMPLET des flags -G récurrents
+                  %w[OTHER_CFLAGS OTHER_CPLUSPLUSFLAGS OTHER_LDFLAGS].each do |flag|
+                    if config.build_settings[flag]
+                      config.build_settings[flag] = config.build_settings[flag].reject { |f| f.include?("-G") }
+                    end
+                  end
                   config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "13.0"
                 end
               end
             end
           PODFILE
           )'
+
+      - name: Install Pods + Patch -G
+        run: |
+          cd ios
+          pod install
+          # 🔥 SUPPRESSION GLOBALE DU FLAG -G (après génération)
+          find Pods -name "*.xcconfig" -type f -exec sed -i '' 's/-G//g' {} + || true
+          sed -i '' 's/-G//g' Pods/**/*.xcconfig || true
+          cd ..
 
       - name: Build iOS (No Codesign)
         run: |
