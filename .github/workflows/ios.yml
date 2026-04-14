@@ -67,6 +67,9 @@ jobs:
                   config.build_settings["OTHER_CFLAGS"] = "$(inherited)"
                   config.build_settings["OTHER_CPLUSPLUSFLAGS"] = "$(inherited)"
                   config.build_settings["OTHER_LDFLAGS"] = "$(inherited)"
+                  
+                  # 🚀 NUCLEAR FIX: Désactiver la couverture de code (source potentielle de -G)
+                  config.build_settings['CLANG_ENABLE_CODE_COVERAGE'] = 'NO'
                 end
               end
             end
@@ -74,13 +77,15 @@ jobs:
           )'
           cd ios && pod repo update && pod install && cd ..
 
-      - name: Hard Scrub -G Flags
+      - name: Hard Scrub -G Flags (Nuclear Mode)
         run: |
-          echo "🔥 Scrubbing -G everywhere (pbxproj and xcconfig)..."
-          find ios -type f \( -name "*.xcconfig" -o -name "*.pbxproj" \) -exec sed -i '' 's/-G//g' {} + || true
-          # Verification Debug
-          echo "🔍 Recherche de traces de -G..."
-          grep -R "\-G" ios || echo "✅ AUCUN FLAG -G TROUVE"
+          echo "🔥 Nuclear Scrubbing of -G flag in ALL files..."
+          # Nettoyage récursif de TOUS les fichiers dans ios/
+          find ios -type f -exec sed -i '' 's/-G//g' {} + || true
+          
+          # Vérification post-nettoyage
+          echo "🔍 Recherche de traces résiduelles de -G..."
+          grep -R "\-G" ios || echo "✅ AUCUN FLAG -G TROUVE DANS LE SYSTEME DE FICHIERS"
 
       - name: Build iOS
         run: flutter build ios --release --no-codesign
