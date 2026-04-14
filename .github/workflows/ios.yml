@@ -74,6 +74,14 @@ jobs:
           )'
           cd ios && pod repo update && pod install && cd ..
 
+      - name: Hard Scrub -G Flags
+        run: |
+          echo "🔥 Scrubbing -G everywhere (pbxproj and xcconfig)..."
+          find ios -type f \( -name "*.xcconfig" -o -name "*.pbxproj" \) -exec sed -i '' 's/-G//g' {} + || true
+          # Verification Debug
+          echo "🔍 Recherche de traces de -G..."
+          grep -R "\-G" ios || echo "✅ AUCUN FLAG -G TROUVE"
+
       - name: Build iOS
         run: flutter build ios --release --no-codesign
 
