@@ -1,4 +1,5 @@
 name: carte_nabil
+# Trigger CI build for iOS stabilization
 description: Specialized Membership Scanner App for ASSIMA-10.
 publish_to: 'none'
 version: 1.0.0+1

@@ -6,8 +6,8 @@ import os
 REPO = "djenadimohamedamine-code/carte-nabil"
 GITHUB_API = f"https://api.github.com/repos/{REPO}/actions/runs"
 
-def check_android_build():
-    print(f"\n[*] Surveillance du build sur GitHub: {REPO}")
+def check_ios_build():
+    print(f"\n[*] Surveillance du build iOS sur GitHub: {REPO}")
     print("[*] Appuyez sur Ctrl+C pour arreter la surveillance.\n")
     
     last_id = None
@@ -39,13 +39,14 @@ def check_android_build():
 
             if status == "completed":
                 if conclusion == "success":
-                    print(f"\n[SUCCESS] Build reussi ! APK disponible sur GitHub.")
+                    print(f"\n[SUCCESS] Build iOS reussi ! IPA/App disponible sur GitHub.")
                 else:
-                    print(f"\n[FAILED] Le build a echoue (Conclusion: {conclusion}).")
+                    print(f"\n[FAILED] Le build iOS a echoue (Conclusion: {conclusion}).")
                 print(f"[URL] {run['html_url']}")
                 break
             else:
-                print(f"[*] Statut actuel: {status}...", end="\r")
+                # Provide real-time feedback on progress
+                print(f"[*] Statut: {status} | Nom: {run['name']}...", end="\r")
                 
         except Exception as e:
             print(f"\n[!] Erreur de surveillance: {e}")
@@ -53,4 +54,4 @@ def check_android_build():
         time.sleep(10)
 
 if __name__ == "__main__":
-    check_android_build()
+    check_ios_build()
