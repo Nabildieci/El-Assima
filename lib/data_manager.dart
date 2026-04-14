@@ -4,14 +4,13 @@ class DataManager {
   static Future<void> seedInitialMembers() async {
     final collection = FirebaseFirestore.instance.collection('members');
     
-    // 1. Clean up potential duplicates (Optional but recommended since user complained)
-    // We only keep ac001 and ac010. We delete anything else for now to reset.
+    // 1. Full clean up of the members collection to avoid any duplicates
     final snapshot = await collection.get();
+    final cleanupBatch = FirebaseFirestore.instance.batch();
     for (var doc in snapshot.docs) {
-      if (doc.id != 'ac001' && doc.id != 'AC010' && doc.id != 'ac010') {
-        await doc.reference.delete();
-      }
+      cleanupBatch.delete(doc.reference);
     }
+    await cleanupBatch.commit();
 
     // 2. Seed Souheib
     await collection.doc('ac001').set({
