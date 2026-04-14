@@ -14,24 +14,24 @@ class _MembersListScreenState extends State<MembersListScreen> {
 
   Future<void> _seedInitialMembers() async {
     final collection = FirebaseFirestore.instance.collection('members');
-    final snapshot = await collection.get();
     
-    if (snapshot.docs.isEmpty) {
-      await collection.add({
-        'name': 'Laroui Souheib',
-        'cardId': 'ac001',
-        'is_present': false,
-        'matricule': 'ac001',
-        'zone': 14,
-      });
-      await collection.add({
-        'name': 'Lafri Nabil',
-        'cardId': 'ac010',
-        'is_present': false,
-        'matricule': 'ac010',
-        'zone': 14,
-      });
-    }
+    // Seed Souheib
+    await collection.doc('ac001').set({
+      'name': 'Laroui Souheib',
+      'cardId': 'ac001',
+      'is_present': false,
+      'matricule': 'ac001',
+      'zone': 14,
+    }, SetOptions(merge: true));
+
+    // Seed Nabil
+    await collection.doc('ac010').set({
+      'name': 'Lafri Nabil',
+      'cardId': 'ac010',
+      'is_present': false,
+      'matricule': 'ac010',
+      'zone': 14,
+    }, SetOptions(merge: true));
   }
 
   @override
@@ -42,9 +42,6 @@ class _MembersListScreenState extends State<MembersListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Attempt seeding when building
-    _seedInitialMembers();
-
     return Column(
       children: [
         Container(

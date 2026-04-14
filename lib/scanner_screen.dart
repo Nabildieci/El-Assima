@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class ScannerScreen extends StatefulWidget {
   const ScannerScreen({super.key});
@@ -16,6 +17,10 @@ class _ScannerScreenState extends State<ScannerScreen> {
   bool _isCameraInitialized = false;
   bool _isScanning = false;
   String _scanResult = "Placez la carte dans l'objectif et lancez l'analyse.";
+  
+  List<CameraDescription> _cameras = [];
+  int _selectedCameraIndex = 0;
+
 
   @override
   void initState() {
@@ -25,13 +30,23 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
   Future<void> _initializeCamera() async {
     try {
-      final cameras = await availableCameras();
-      if (cameras.isEmpty) {
+      _cameras = await availableCameras();
+      if (_cameras.isEmpty) {
         setState(() => _scanResult = "Aucune caméra trouvée.");
         return;
       }
       
-      final camera = cameras.first;
+      // Try to find the back camera by default if not already selected
+      if (_cameraController == null) {
+        for (int i = 0; i < _cameras.length; i++) {
+          if (_cameras[i].lensDirection == CameraLensDirection.back) {
+            _selectedCameraIndex = i;
+            break;
+          }
+        }
+      }
+
+      final camera = _cameras[_selectedCameraIndex];
       _cameraController = CameraController(
         camera,
         ResolutionPreset.high,
@@ -49,7 +64,24 @@ class _ScannerScreenState extends State<ScannerScreen> {
     }
   }
 
+  Future<void> _toggleCamera() async {
+    if (_cameras.length < 2) return;
+    
+    _selectedCameraIndex = (_selectedCameraIndex + 1) % _cameras.length;
+    await _cameraController?.dispose();
+    _cameraController = null;
+    setState(() {
+      _isCameraInitialized = false;
+    });
+    _initializeCamera();
+  }
+
   Future<void> _scanImage() async {
+    if (kIsWeb) {
+      setState(() => _scanResult = "⚠️ Le scanner OCR n'est pas supporté sur la version Web. Veuillez utiliser l'application Android.");
+      return;
+    }
+
     if (_cameraController == null || !_cameraController!.value.isInitialized) return;
     if (_isScanning) return;
 
@@ -179,7 +211,23 @@ class _ScannerScreenState extends State<ScannerScreen> {
               border: Border.all(color: Theme.of(context).colorScheme.primary, width: 4),
             ),
             clipBehavior: Clip.hardEdge,
-            child: CameraPreview(_cameraController!),
+            child: Stack(
+              children: [
+                Positioned.fill(child: CameraPreview(_cameraController!)),
+                if (_cameras.length > 1)
+                  Positioned(
+                    top: 10,
+                    right: 10,
+                    child: CircleAvatar(
+                      backgroundColor: Colors.black54,
+                      child: IconButton(
+                        icon: const Icon(Icons.flip_camera_ios, color: Colors.white),
+                        onPressed: _toggleCamera,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
         Expanded(
