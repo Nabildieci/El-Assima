@@ -287,7 +287,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
           HapticFeedback.vibrate();
           setState(() {
             _showSuccessOverlay = true;
-            _scanResult = "✅ ACCÈS AUTORISÉ\n\n$foundName\nZONE : $foundZone\nMATRICULE : $foundMatricule";
+            _scanResult = "✅ $foundName\nZONE : $foundZone\nMATRICULE : $foundMatricule";
           });
           
           Future.delayed(const Duration(seconds: 3), () {
@@ -428,7 +428,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
                       _scanResult,
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: _scanResult.contains("✅") ? 22 : 16,
+                        fontSize: _scanResult.contains("✅") ? 28 : 16,
                         letterSpacing: 0.5,
                         height: 1.4,
                         fontWeight: FontWeight.bold,

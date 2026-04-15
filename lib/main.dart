@@ -100,7 +100,7 @@ class _MainScreenState extends State<MainScreen> {
               child: Container(
                 color: Colors.white,
                 padding: const EdgeInsets.all(2),
-                child: Image.asset('assets/images/logo.webp', height: 31, width: 31, fit: BoxFit.cover),
+                child: Image.asset('assets/images/logo_2.jpg', height: 31, width: 31, fit: BoxFit.cover),
               ),
             ),
             const SizedBox(width: 12),
@@ -109,7 +109,16 @@ class _MainScreenState extends State<MainScreen> {
         ),
         elevation: 0,
       ),
-      body: _pages[_currentIndex],
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/images/arriere_plan.jpg"),
+            fit: BoxFit.cover,
+            opacity: 0.25, // Translucent enough for readability
+          ),
+        ),
+        child: _pages[_currentIndex],
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
         onDestinationSelected: (int index) {
