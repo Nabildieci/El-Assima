@@ -13,8 +13,15 @@ class DataManager {
     
     print("Initialisation de la base de données (première fois)...");
 
-    // 2. Sample data (Added ID001 and AC010 for testing orders)
+    // 2. Sample data (Added members for testing)
     final List<Map<String, dynamic>> initialData = [
+      {
+        'cardId': 'LS001',
+        'name': 'Laroui Souheib',
+        'is_present': false,
+        'matricule': 'LS001',
+        'zone': 14,
+      },
       {
         'cardId': 'ID001',
         'name': 'Test User ID001',
