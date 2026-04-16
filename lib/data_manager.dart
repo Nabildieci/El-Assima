@@ -16,10 +16,10 @@ class DataManager {
     // 2. Sample data (Added members for testing)
     final List<Map<String, dynamic>> initialData = [
       {
-        'cardId': 'LS001',
+        'cardId': 'AC001',
         'name': 'Laroui Souheib',
         'is_present': false,
-        'matricule': 'LS001',
+        'matricule': 'AC001',
         'zone': 14,
       },
       {

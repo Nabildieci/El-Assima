@@ -112,8 +112,8 @@ class _ScannerScreenState extends State<ScannerScreen> {
         
         List<String> candidates = [];
         
-        // Strategy 1: Look for exact Matricule pattern (e.g. AC010)
-        final matriculeRegex = RegExp(r'[A-Z]{2}[0-9]{2,4}');
+        // Strategy 1: Look for exact Matricule pattern (e.g. AC001, AC010)
+        final matriculeRegex = RegExp(r'[A-Z]+[0-9]{1,5}'); // More flexible: 1 to 5 digits
         final matches = matriculeRegex.allMatches(allText);
         for (var match in matches) {
           candidates.add(match.group(0)!);
