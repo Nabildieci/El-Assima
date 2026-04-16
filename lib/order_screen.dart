@@ -63,7 +63,7 @@ class _OrderScreenState extends State<OrderScreen> {
         'size': _selectedProduct == 'Maillot' ? _selectedSize : 'N/A',
         'quantity': _selectedProduct == 'Maillot' ? 1 : _quantity,
         'product': _selectedProduct == 'Maillot' ? 'Maillot Officiel EL ASSIMA' : 'Porte-clé Officiel',
-        'price': _selectedProduct == 'Maillot' ? 5500 : 500,
+        'price': _selectedProduct == 'Maillot' ? 5000 : 500,
         'timestamp': FieldValue.serverTimestamp(),
         'status': 'En attente',
       });
@@ -113,14 +113,14 @@ class _OrderScreenState extends State<OrderScreen> {
               Expanded(
                 child: GestureDetector(
                   onTap: () => setState(() => _selectedProduct = 'Maillot'),
-                  child: _buildProductCard('Maillot', '5500 DA', 'maillot.png', _selectedProduct == 'Maillot'),
+                  child: _buildProductCard('Maillot', '5000 DA', 'arriere_plan.jpg', _selectedProduct == 'Maillot'),
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: GestureDetector(
                   onTap: () => setState(() => _selectedProduct = 'Porte-clé'),
-                  child: _buildProductCard('Porte-clé', '500 DA', 'porte-clé.jpeg', _selectedProduct == 'Porte-clé'),
+                  child: _buildProductCard('Porte-clé', '500 DA', 'porte clé new.jpg', _selectedProduct == 'Porte-clé'),
                 ),
               ),
             ],
@@ -208,9 +208,9 @@ class _OrderScreenState extends State<OrderScreen> {
             padding: const EdgeInsets.all(8.0),
             child: AspectRatio(
               aspectRatio: 1,
-              child: imageName == 'maillot.png' 
+              child: (imageName == 'maillot.png' || imageName == '') 
                 ? const Icon(Icons.checkroom, size: 60, color: Colors.grey)
-                : Image.asset('assets/images/$imageName', fit: BoxFit.contain, errorBuilder: (c, e, s) => const Icon(Icons.shopping_bag, size: 40)),
+                : Image.asset('assets/images/$imageName', fit: BoxFit.cover, errorBuilder: (c, e, s) => const Icon(Icons.shopping_bag, size: 40)),
             ),
           ),
           Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
