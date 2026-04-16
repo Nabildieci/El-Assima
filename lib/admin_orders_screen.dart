@@ -102,20 +102,46 @@ class AdminOrdersScreen extends StatelessWidget {
     return ListView.builder(
       itemCount: orders.length,
       itemBuilder: (context, index) {
-        final data = orders[index].data() as Map<String, dynamic>;
+        final doc = orders[index];
+        final data = doc.data() as Map<String, dynamic>;
         return Card(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          elevation: 2,
           child: ListTile(
             leading: const CircleAvatar(backgroundColor: Colors.black, child: Icon(Icons.person, color: Colors.white)),
             title: Text(data['memberName'] ?? 'Inconnu', style: const TextStyle(fontWeight: FontWeight.bold)),
             subtitle: Text("ID: ${data['memberId']} • Zone ${data['zone']}"),
-            trailing: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(8)),
-              child: Text(
-                data['size'] ?? '?',
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-              ),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(8)),
+                  child: Text(
+                    data['size'] ?? '?',
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete_outline, color: Colors.red),
+                  onPressed: () async {
+                    final confirm = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text("Annuler cette commande ?"),
+                        content: Text("Voulez-vous supprimer la commande de ${data['memberName']} ?"),
+                        actions: [
+                          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("NON")),
+                          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("OUI", style: TextStyle(color: Colors.red))),
+                        ],
+                      ),
+                    );
+                    if (confirm == true) {
+                      await FirebaseFirestore.instance.collection('orders').doc(doc.id).delete();
+                    }
+                  },
+                ),
+              ],
             ),
           ),
         );
@@ -137,7 +163,7 @@ class AdminOrdersScreen extends StatelessWidget {
       children: [
         const Padding(
           padding: EdgeInsets.symmetric(vertical: 10),
-          child: Text("TOTAL PAR TAILLE", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+          child: Text("TOTAL GÉNÉRAL PAR TAILLE", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
         ),
         ...sortedSizes.map((size) {
           final count = stats[size] ?? 0;
@@ -155,32 +181,76 @@ class AdminOrdersScreen extends StatelessWidget {
   }
 
   Widget _buildStatsByZone(List<QueryDocumentSnapshot> orders) {
-    Map<int, int> stats = {};
+    // Map<Zone, Map<Size, Count>>
+    Map<int, Map<String, int>> zoneStats = {};
+    
     for (var doc in orders) {
       final data = doc.data() as Map<String, dynamic>;
       final zone = data['zone'] ?? 0;
-      stats[zone] = (stats[zone] ?? 0) + 1;
+      final size = data['size'] ?? 'Unknown';
+      
+      zoneStats.putIfAbsent(zone, () => {});
+      zoneStats[zone]![size] = (zoneStats[zone]![size] ?? 0) + 1;
     }
 
-    final sortedZones = stats.keys.toList()..sort();
+    final sortedZones = zoneStats.keys.toList()..sort();
+    final sortedSizes = ['S', 'M', 'L', 'XL', 'XXL'];
 
-    return ListView(
+    return ListView.builder(
       padding: const EdgeInsets.all(16),
-      children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(vertical: 10),
-          child: Text("TOTAL PAR ZONE", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
-        ),
-        ...sortedZones.map((zone) {
-          final count = stats[zone] ?? 0;
-          return Card(
-            child: ListTile(
-              title: Text("ZONE $zone"),
-              trailing: Text("$count commandes", style: const TextStyle(fontWeight: FontWeight.bold)),
+      itemCount: sortedZones.length,
+      itemBuilder: (context, index) {
+        final zone = sortedZones[index];
+        final sizes = zoneStats[zone]!;
+        int totalInZone = sizes.values.fold(0, (sum, val) => sum + val);
+
+        return Card(
+          margin: const EdgeInsets.only(bottom: 16),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("ZONE $zone", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red)),
+                    Text("$totalInZone COMMANDES", style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 12)),
+                  ],
+                ),
+                const Divider(),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 10,
+                  children: sortedSizes.map((size) {
+                    final count = sizes[size] ?? 0;
+                    return Column(
+                      children: [
+                        Text(size, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: count > 0 ? Colors.black : Colors.grey[100],
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Text(
+                            "$count",
+                            style: TextStyle(
+                              color: count > 0 ? Colors.white : Colors.grey,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  }).toList(),
+                ),
+              ],
             ),
-          );
-        }),
-      ],
+          ),
+        );
+      },
     );
   }
 }
