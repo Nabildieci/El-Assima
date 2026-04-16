@@ -9,7 +9,7 @@ class MembersListScreen extends StatefulWidget {
 }
 
 class _MembersListScreenState extends State<MembersListScreen> {
-  int _selectedZone = 14; // Default to Zone 14 only
+  int _selectedZone = 1; // Default back to Zone 1
 
 
   @override
@@ -34,7 +34,7 @@ class _MembersListScreenState extends State<MembersListScreen> {
     );
 
     if (confirmed == true) {
-      final snapshot = await FirebaseFirestore.instance.collection('members').where('zone', isEqualTo: 14).get();
+      final snapshot = await FirebaseFirestore.instance.collection('members').get();
       final batch = FirebaseFirestore.instance.batch();
       for (var doc in snapshot.docs) {
         batch.update(doc.reference, {'is_present': false});
@@ -42,7 +42,7 @@ class _MembersListScreenState extends State<MembersListScreen> {
       await batch.commit();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Liste Zone 14 réinitialisée !")),
+          const SnackBar(content: Text("Liste réinitialisée avec succès !")),
         );
       }
     }
@@ -61,13 +61,32 @@ class _MembersListScreenState extends State<MembersListScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                "ZONE 14 - LISTE DES MEMBRES",
+                "LISTE DES MEMBRES",
                 style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
               IconButton(
                 icon: const Icon(Icons.refresh, color: Colors.white),
-                tooltip: "Réinitialiser la zone 14",
+                tooltip: "Réinitialiser la liste",
                 onPressed: _resetAttendance,
+              ),
+              DropdownButton<int>(
+                value: _selectedZone,
+                dropdownColor: Colors.black,
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                underline: Container(height: 2, color: Colors.white),
+                items: List.generate(14, (index) => index + 1).map((int value) {
+                  return DropdownMenuItem<int>(
+                    value: value,
+                    child: Text("ZONE $value"),
+                  );
+                }).toList(),
+                onChanged: (int? newValue) {
+                  if (newValue != null) {
+                    setState(() {
+                      _selectedZone = newValue;
+                    });
+                  }
+                },
               ),
             ],
           ),

@@ -13,37 +13,8 @@ class DataManager {
     
     print("Initialisation de la base de données (première fois)...");
 
-    // 2. Sample data for Zone 14 ONLY
-    final List<Map<String, dynamic>> initialData = [
-      {
-        'cardId': 'AC001',
-        'name': 'Laroui Souheib',
-        'is_present': false,
-        'matricule': 'AC001',
-        'zone': 14,
-      },
-      {
-        'cardId': 'AC010',
-        'name': 'Lafri Nabil Riad',
-        'is_present': false,
-        'matricule': 'AC010',
-        'zone': 14,
-      },
-      {
-        'cardId': 'AC105',
-        'name': 'Mahrez Riyad',
-        'is_present': false,
-        'matricule': 'AC105',
-        'zone': 14,
-      },
-      {
-        'cardId': 'AC106',
-        'name': 'Slimani Islam',
-        'is_present': false,
-        'matricule': 'AC106',
-        'zone': 14,
-      },
-    ];
+    // 2. Sample data (Empty for now as requested)
+    final List<Map<String, dynamic>> initialData = [];
 
     final batch = FirebaseFirestore.instance.batch();
     for (var member in initialData) {

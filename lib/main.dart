@@ -105,8 +105,16 @@ class _MainScreenState extends State<MainScreen> {
                 child: Image.asset('assets/images/logo_2.jpg', height: 31, width: 31, fit: BoxFit.cover),
               ),
             ),
-            const SizedBox(width: 12),
-            const Text('ASSIMA-10', style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.5)),
+            const Text(
+              'EL ASSIMA', 
+              style: TextStyle(
+                fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.w300, 
+                letterSpacing: 2.0,
+                fontSize: 18,
+                fontFamily: 'Georgia', // Using a serif font for a signature feel if available
+              )
+            ),
           ],
         ),
         elevation: 0,
