@@ -7,6 +7,7 @@ import 'history_screen.dart';
 import 'data_manager.dart';
 import 'order_screen.dart';
 import 'admin_orders_screen.dart';
+import 'login_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,8 +24,15 @@ void main() async {
   runApp(const ClubApp()); // Votre application continue de tourner même si Firebase a un souci
 }
 
-class ClubApp extends StatelessWidget {
+class ClubApp extends StatefulWidget {
   const ClubApp({super.key});
+
+  @override
+  State<ClubApp> createState() => _ClubAppState();
+}
+
+class _ClubAppState extends State<ClubApp> {
+  bool _isAuthenticated = false;
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +80,9 @@ class ClubApp extends StatelessWidget {
         ),
       ),
       themeMode: ThemeMode.system,
-      home: const MainScreen(),
+      home: _isAuthenticated 
+        ? const MainScreen() 
+        : LoginScreen(onLoginSuccess: () => setState(() => _isAuthenticated = true)),
     );
   }
 }
