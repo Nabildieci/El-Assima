@@ -44,6 +44,7 @@ class _OrderScreenState extends State<OrderScreen> {
       await FirebaseFirestore.instance.collection('orders').doc(memberId).set({
         'memberId': memberId,
         'memberName': memberDoc.data()?['name'] ?? 'Inconnu',
+        'zone': memberDoc.data()?['zone'] ?? 0, // IMPORTANT: Saving zone for stats
         'size': _selectedSize,
         'product': 'Maillot Officiel EL ASSIMA',
         'timestamp': FieldValue.serverTimestamp(),

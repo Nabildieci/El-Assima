@@ -6,6 +6,7 @@ import 'members_list_screen.dart';
 import 'history_screen.dart';
 import 'data_manager.dart';
 import 'order_screen.dart';
+import 'admin_orders_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -90,6 +91,7 @@ class _MainScreenState extends State<MainScreen> {
     const ScannerScreen(),
     const MembersListScreen(),
     const OrderScreen(),
+    const AdminOrdersScreen(), // New Admin Tab
     const HistoryScreen(),
   ];
 
@@ -111,10 +113,9 @@ class _MainScreenState extends State<MainScreen> {
               'EL ASSIMA', 
               style: TextStyle(
                 fontStyle: FontStyle.italic,
-                fontWeight: FontWeight.w300, 
-                letterSpacing: 2.0,
-                fontSize: 18,
-                fontFamily: 'Georgia', // Using a serif font for a signature feel if available
+                fontWeight: FontWeight.w900, 
+                letterSpacing: 3.5,
+                fontSize: 20,
               )
             ),
           ],
@@ -153,6 +154,11 @@ class _MainScreenState extends State<MainScreen> {
             icon: Icon(Icons.shopping_bag_outlined),
             selectedIcon: Icon(Icons.shopping_bag),
             label: 'BOUTIQUE',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.admin_panel_settings_outlined),
+            selectedIcon: Icon(Icons.admin_panel_settings),
+            label: 'ADMIN',
           ),
           NavigationDestination(
             icon: Icon(Icons.history_outlined),
