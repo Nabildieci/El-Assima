@@ -43,14 +43,12 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             // Updated Logo to IMG_9510.jpeg
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(20),
               decoration: const BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
               ),
-              child: ClipOval(
-                child: Image.asset('assets/images/IMG_9510.jpeg', height: 120, width: 120, fit: BoxFit.cover),
-              ),
+              child: Image.asset('assets/images/logo_2.jpg', height: 100),
             ),
             const SizedBox(height: 30),
             const Text(
