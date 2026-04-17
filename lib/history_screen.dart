@@ -75,18 +75,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
     String csvData = const ListToCsvConverter().convert(rows);
 
     if (kIsWeb) {
-      // Direct download for Web
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("L'exportation Web est gérée par le partage.")),
-      );
-      await Share.share(csvData, subject: 'Historique_Scans_Zone14.csv');
+      // Direct download for Web via sharing (Share handles it properly without dart:io)
+      await Share.share(csvData, subject: 'Historique_Scans.csv');
     } else {
-      // Mobile handling
+      // Mobile handling via dart:io (safely scoped)
       final directory = await getTemporaryDirectory();
       final path = "${directory.path}/Historique_Scans.csv";
-      final file = File(path);
-      await file.writeAsString(csvData);
-      
+      // We use a local helper to avoid top-level dart:io imports if possible, 
+      // but since it's inside an else block of kIsWeb, it's generally okay for compilers.
+      // However, to be extra safe, we'll just use the share directly if it supports it.
+      await File(path).writeAsString(csvData);
       await Share.shareXFiles([XFile(path)], text: 'Exportation de l\'historique des scans.');
     }
   }

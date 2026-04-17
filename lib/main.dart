@@ -96,7 +96,7 @@ class _MainScreenState extends State<MainScreen> {
       const MembersListScreen(),
       const OrderScreen(),
       const AdminOrdersScreen(),
-      const HistoryScreen(),
+      if (!kIsWeb) const HistoryScreen(),
     ];
 
     return Scaffold(
@@ -165,11 +165,12 @@ class _MainScreenState extends State<MainScreen> {
             selectedIcon: Icon(Icons.shopping_cart_checkout, color: Colors.red),
             label: 'COMMANDE', 
           ),
-          const NavigationDestination(
-            icon: Icon(Icons.history_outlined),
-            selectedIcon: Icon(Icons.history, color: Colors.red),
-            label: 'Historique',
-          ),
+          if (!kIsWeb)
+            const NavigationDestination(
+              icon: Icon(Icons.history_outlined),
+              selectedIcon: Icon(Icons.history, color: Colors.red),
+              label: 'Historique',
+            ),
         ],
       ),
     );

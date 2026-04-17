@@ -209,7 +209,7 @@ class AdminOrdersScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
             decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(10)),
-            child: Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.black, fontSize: 14)),
+            child: Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 14)),
           ),
         ],
       ),
