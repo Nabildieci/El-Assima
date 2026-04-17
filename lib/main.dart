@@ -104,7 +104,6 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Role-based pages and destinations
     final List<Widget> pages = [];
     final List<NavigationDestination> destinations = [];
 
@@ -125,21 +124,15 @@ class _MainScreenState extends State<MainScreen> {
         const NavigationDestination(icon: Icon(Icons.history_outlined), selectedIcon: Icon(Icons.history, color: Colors.red), label: 'Historique'),
       ]);
     } else {
-      // User 0101: Only Zones and Boutique
-      pages.addAll([
-        MembersListScreen(isAdmin: false),
-        const OrderScreen(),
-      ]);
-      destinations.addAll([
-        const NavigationDestination(icon: Icon(Icons.people_outline), selectedIcon: Icon(Icons.people, color: Colors.red), label: 'ZONES'),
-        const NavigationDestination(icon: Icon(Icons.shopping_bag_outlined), selectedIcon: Icon(Icons.shopping_bag, color: Colors.red), label: 'BOUTIQUE'),
-      ]);
+      // User 0101: ONLY BOUTIQUE (Zones removed as requested)
+      pages.add(const OrderScreen());
+      destinations.add(const NavigationDestination(icon: Icon(Icons.shopping_bag_outlined), selectedIcon: Icon(Icons.shopping_bag, color: Colors.red), label: 'BOUTIQUE'));
     }
 
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Image.asset('assets/images/logo_2.jpg', height: 45), // New Logo layout without text
+        title: Image.asset('assets/images/logo_2.jpg', height: 45),
         elevation: 0,
         actions: [
           IconButton(
@@ -158,7 +151,8 @@ class _MainScreenState extends State<MainScreen> {
         ),
         child: pages[_currentIndex],
       ),
-      bottomNavigationBar: NavigationBar(
+      // Hide bottom navigation if only one tab is available
+      bottomNavigationBar: destinations.length > 1 ? NavigationBar(
         selectedIndex: _currentIndex,
         onDestinationSelected: (int index) {
           setState(() {
@@ -167,7 +161,7 @@ class _MainScreenState extends State<MainScreen> {
         },
         indicatorColor: Colors.red.withOpacity(0.2),
         destinations: destinations,
-      ),
+      ) : null,
     );
   }
 }
