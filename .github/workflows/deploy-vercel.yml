@@ -37,7 +37,16 @@ jobs:
         run: flutter pub get
 
       - name: Build Web
-        run: flutter build web --release
+        run: flutter build web --release --web-renderer canvaskit
+
+      - name: Verify Build
+        run: |
+          echo "Checking build/web content:"
+          ls -lh build/web
+          if [ ! -f "build/web/main.dart.js" ]; then
+            echo "ERROR: main.dart.js not found!"
+            exit 1
+          fi
 
       - name: Prepare Deployment Folder
         run: cp vercel.json build/web/
@@ -50,4 +59,4 @@ jobs:
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           vercel-version: latest
           working-directory: build/web
-          vercel-args: '--prod'
+          vercel-args: '--prod --yes'
