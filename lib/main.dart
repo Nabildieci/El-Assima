@@ -153,27 +153,27 @@ class _MainScreenState extends State<MainScreen> {
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.qr_code_scanner),
-            selectedIcon: Icon(Icons.camera_alt, color: Colors.white),
+            selectedIcon: Icon(Icons.camera_alt, color: Colors.red),
             label: 'Scanner',
           ),
           NavigationDestination(
             icon: Icon(Icons.people_outline),
-            selectedIcon: Icon(Icons.people, color: Colors.white),
+            selectedIcon: Icon(Icons.people, color: Colors.red),
             label: 'ZONES',
           ),
           NavigationDestination(
             icon: Icon(Icons.shopping_bag_outlined),
-            selectedIcon: Icon(Icons.shopping_bag, color: Colors.white),
+            selectedIcon: Icon(Icons.shopping_bag, color: Colors.red),
             label: 'BOUTIQUE',
           ),
           NavigationDestination(
             icon: Icon(Icons.shopping_cart_checkout_outlined),
-            selectedIcon: Icon(Icons.shopping_cart_checkout, color: Colors.white),
+            selectedIcon: Icon(Icons.shopping_cart_checkout, color: Colors.red),
             label: 'COMMANDE', 
           ),
           NavigationDestination(
             icon: Icon(Icons.history_outlined),
-            selectedIcon: Icon(Icons.history, color: Colors.white),
+            selectedIcon: Icon(Icons.history, color: Colors.red),
             label: 'Historique',
           ),
         ],
