@@ -252,11 +252,10 @@ class AdminOrdersScreen extends StatelessWidget {
               decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(8)),
               child: Text(trailing, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 12)),
             ),
-            if (isAdmin) // Only show delete button for admins
-              IconButton(
-                icon: Icon(Icons.close_rounded, color: Colors.red.shade300, size: 20),
-                onPressed: onDelete,
-              ),
+            IconButton(
+              icon: Icon(Icons.close_rounded, color: Colors.red.shade300, size: 20),
+              onPressed: onDelete,
+            ),
           ],
         ),
       ),
