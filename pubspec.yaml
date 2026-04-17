@@ -30,15 +30,6 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
-  flutter_launcher_icons: ^0.13.1
-
-flutter_launcher_icons:
-  android: "ic_launcher"
-  ios: true
-  image_path: "assets/images/logo.webp"
-  adaptive_icon_background: "#0a0a0a"
-  adaptive_icon_foreground: "assets/images/logo.webp"
-  remove_alpha_ios: true
 
 flutter:
   uses-material-design: true
