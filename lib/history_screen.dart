@@ -3,10 +3,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:csv/csv.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 class HistoryScreen extends StatefulWidget {
-  const HistoryScreen({super.key});
+  final bool isAdmin;
+  const HistoryScreen({super.key, required this.isAdmin});
 
   @override
   State<HistoryScreen> createState() => _HistoryScreenState();
@@ -71,8 +71,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
     }
 
     String csvData = const ListToCsvConverter().convert(rows);
-
-    // Platform-safe sharing
     await Share.share(csvData, subject: 'Historique_Scans.csv');
   }
 
@@ -102,11 +100,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     tooltip: "Exporter en CSV",
                     onPressed: _exportToCSV,
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.delete_sweep, color: Colors.redAccent),
-                    tooltip: "Effacer l'historique",
-                    onPressed: _clearHistory,
-                  ),
+                  if (widget.isAdmin) // PROTECTING DELETE BUTTON
+                    IconButton(
+                      icon: const Icon(Icons.delete_sweep, color: Colors.redAccent),
+                      tooltip: "Effacer l'historique",
+                      onPressed: _clearHistory,
+                    ),
                 ],
               ),
             ],
@@ -119,45 +118,26 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 .orderBy('timestamp', descending: true)
                 .snapshots(),
             builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                return const Center(child: Text("Erreur de chargement de l'historique."));
-              }
-
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
+              if (snapshot.hasError) return const Center(child: Text("Erreur de chargement."));
+              if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
 
               final scans = snapshot.data!.docs;
-
-              if (scans.isEmpty) {
-                return const Center(
-                  child: Text(
-                    "Aucun scan enregistré pour le moment.",
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                );
-              }
+              if (scans.isEmpty) return const Center(child: Text("Aucun scan enregistré.", style: TextStyle(color: Colors.grey)));
 
               return ListView.builder(
                 itemCount: scans.length,
                 itemBuilder: (context, index) {
                   final scan = scans[index].data() as Map<String, dynamic>;
-                  final String name = scan['name'] ?? 'Inconnu';
-                  final String zone = (scan['zone'] ?? '?').toString();
                   final DateTime timestamp = (scan['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now();
-                  final String timeStr = DateFormat('HH:mm:ss').format(timestamp);
                   final String dateStr = DateFormat('dd MMMM yyyy').format(timestamp);
+                  final String timeStr = DateFormat('HH:mm:ss').format(timestamp);
 
-                  // Check if we need a date header
                   bool showHeader = false;
-                  if (index == 0) {
-                    showHeader = true;
-                  } else {
+                  if (index == 0) showHeader = true;
+                  else {
                     final prevScan = scans[index - 1].data() as Map<String, dynamic>;
                     final DateTime prevTimestamp = (prevScan['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now();
-                    if (DateFormat('yyyy-MM-dd').format(timestamp) != DateFormat('yyyy-MM-dd').format(prevTimestamp)) {
-                      showHeader = true;
-                    }
+                    if (DateFormat('yyyy-MM-dd').format(timestamp) != DateFormat('yyyy-MM-dd').format(prevTimestamp)) showHeader = true;
                   }
 
                   return Column(
@@ -167,27 +147,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          color: Colors.grey[200],
-                          child: Text(
-                            "JOURNÉE DU $dateStr",
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                              color: Colors.black54,
-                              letterSpacing: 1.1,
-                            ),
-                          ),
+                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white10 : Colors.grey[200],
+                          child: Text("JOURNÉE DU $dateStr", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey)),
                         ),
                       ListTile(
-                        leading: const CircleAvatar(
-                          backgroundColor: Colors.black12,
-                          child: Icon(Icons.history, color: Colors.black),
-                        ),
-                        title: Text(
-                          name,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Text("Zone $zone • $timeStr"),
+                        leading: const CircleAvatar(backgroundColor: Colors.black12, child: Icon(Icons.history, color: Colors.black)),
+                        title: Text(scan['name'] ?? 'Inconnu', style: const TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: Text("Zone ${scan['zone'] ?? '?'} • $timeStr"),
                         trailing: const Icon(Icons.check_circle, color: Colors.green, size: 20),
                       ),
                       const Divider(height: 1, indent: 70),

@@ -103,7 +103,7 @@ class _MainScreenState extends State<MainScreen> {
       MembersListScreen(isAdmin: widget.isAdmin),
       const OrderScreen(),
       AdminOrdersScreen(isAdmin: widget.isAdmin),
-      const HistoryScreen(),
+      HistoryScreen(isAdmin: widget.isAdmin),
     ];
 
     return Scaffold(
