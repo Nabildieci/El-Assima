@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'firebase_options.dart';
 import 'scanner_screen.dart';
 import 'members_list_screen.dart';
@@ -33,6 +32,13 @@ class ClubApp extends StatefulWidget {
 class _ClubAppState extends State<ClubApp> {
   bool _isAuthenticated = false;
   bool _isAdmin = false;
+
+  void _onLogout() {
+    setState(() {
+      _isAuthenticated = false;
+      _isAdmin = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +79,7 @@ class _ClubAppState extends State<ClubApp> {
       ),
       themeMode: ThemeMode.system,
       home: _isAuthenticated 
-        ? MainScreen(isAdmin: _isAdmin) 
+        ? MainScreen(isAdmin: _isAdmin, onLogout: _onLogout) 
         : LoginScreen(onLoginSuccess: (isAdmin) {
             setState(() {
               _isAdmin = isAdmin;
@@ -86,7 +92,8 @@ class _ClubAppState extends State<ClubApp> {
 
 class MainScreen extends StatefulWidget {
   final bool isAdmin;
-  const MainScreen({super.key, required this.isAdmin});
+  final VoidCallback onLogout;
+  const MainScreen({super.key, required this.isAdmin, required this.onLogout});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -97,7 +104,6 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Hide scanner on Web since it doesn't work well
     final List<Widget> pages = [
       const ScannerScreen(),
       MembersListScreen(isAdmin: widget.isAdmin),
@@ -131,6 +137,12 @@ class _MainScreenState extends State<MainScreen> {
           ],
         ),
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.white70),
+            onPressed: widget.onLogout,
+          ),
+        ],
       ),
       body: Container(
         decoration: const BoxDecoration(
