@@ -28,9 +28,9 @@ jobs:
 
       - name: Fix App Name & Manifest
         run: |
-          sed -i 's/<title>carte_nabil<\/title>/<title>EL ASSIMA<\/title>/g' web/index.html || true
-          sed -i 's/"name": "carte_nabil"/"name": "EL ASSIMA"/g' web/manifest.json || true
-          sed -i 's/"short_name": "carte_nabil"/"short_name": "EL ASSIMA"/g' web/manifest.json || true
+          sed -i 's/<title>carte_nabil<\/title>/<title>ASSIMA-10<\/title>/g' web/index.html || true
+          sed -i 's/"name": "carte_nabil"/"name": "ASSIMA-10"/g' web/manifest.json || true
+          sed -i 's/"short_name": "carte_nabil"/"short_name": "ASSIMA-10"/g' web/manifest.json || true
           sed -i 's/"background_color": "#0175C2"/"background_color": "#FFC107"/g' web/manifest.json || true
 
       - name: Get Dependencies
