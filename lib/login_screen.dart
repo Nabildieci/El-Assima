@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
-  final VoidCallback onLoginSuccess;
+  final Function(bool isAdmin) onLoginSuccess;
   const LoginScreen({super.key, required this.onLoginSuccess});
 
   @override
@@ -13,8 +13,11 @@ class _LoginScreenState extends State<LoginScreen> {
   String _error = "";
 
   void _checkPin() {
-    if (_pinController.text == "0101") {
-      widget.onLoginSuccess();
+    final code = _pinController.text;
+    if (code == "2020") {
+      widget.onLoginSuccess(true); // Is Admin
+    } else if (code == "0101") {
+      widget.onLoginSuccess(false); // Is Standard User
     } else {
       setState(() {
         _error = "Code incorrect. Veuillez réessayer.";

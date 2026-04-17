@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AdminOrdersScreen extends StatelessWidget {
-  const AdminOrdersScreen({super.key});
+  final bool isAdmin;
+  const AdminOrdersScreen({super.key, required this.isAdmin});
 
   Future<void> _clearOrders(BuildContext context) async {
     final confirmed = await showDialog<bool>(
@@ -63,14 +64,15 @@ class AdminOrdersScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: IconButton(
-                    icon: const Icon(Icons.delete_sweep_outlined, color: Colors.red, size: 22),
-                    tooltip: "Vider les commandes",
-                    onPressed: () => _clearOrders(context),
+                if (isAdmin)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: IconButton(
+                      icon: const Icon(Icons.delete_sweep_outlined, color: Colors.red, size: 22),
+                      tooltip: "Vider les commandes",
+                      onPressed: () => _clearOrders(context),
+                    ),
                   ),
-                ),
               ],
             ),
           ),
@@ -103,7 +105,7 @@ class AdminOrdersScreen extends StatelessWidget {
                   physics: const BouncingScrollPhysics(),
                   children: [
                     _buildOrdersList(context, jerseyOrders, "MAILLOTS", Colors.red),
-                    _buildKeychainOrders(context, keychainOrders),
+                    _buildOrdersList(context, keychainOrders, "PORTE-CLÉS", Colors.amber.shade800),
                     _buildStatsBySize(jerseyOrders),
                     _buildStatsByZone(allOrders),
                   ],
@@ -113,54 +115,6 @@ class AdminOrdersScreen extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildKeychainOrders(BuildContext context, List<QueryDocumentSnapshot> orders) {
-    int totalPcs = 0;
-    Map<String, Map<String, dynamic>> memberStats = {};
-    for (var doc in orders) {
-      final data = doc.data() as Map<String, dynamic>;
-      final mId = data['memberId'];
-      final q = data['quantity'] ?? 1;
-      totalPcs += (q as int);
-      
-      if (!memberStats.containsKey(mId)) {
-        memberStats[mId] = {
-          'name': data['memberName'],
-          'qty': 0,
-          'zone': data['zone'],
-          'docId': doc.id,
-        };
-      }
-      memberStats[mId]!['qty'] += q;
-    }
-
-    final members = memberStats.values.toList();
-
-    return Column(
-      children: [
-        _buildSummaryHeader("TOTAL PORTE-CLÉS", "$totalPcs PCS", Colors.amber.shade800),
-        Expanded(
-          child: ListView.builder(
-            physics: const BouncingScrollPhysics(),
-            itemCount: members.length,
-            itemBuilder: (context, index) {
-              final m = members[index];
-              final mId = memberStats.keys.elementAt(index);
-              return _buildBaseOrderCard(
-                context,
-                m['name'],
-                "ID: $mId • Zone ${m['zone']}",
-                "${m['qty']} PCS",
-                Icons.vpn_key_outlined,
-                Colors.amber.shade800,
-                () {}, // No delete for grouped view simple
-              );
-            },
-          ),
-        ),
-      ],
     );
   }
 
@@ -180,7 +134,7 @@ class AdminOrdersScreen extends StatelessWidget {
                 data['memberName'] ?? 'Inconnu',
                 "ID: ${data['memberId']} • Zone ${data['zone']}",
                 data['size'] ?? 'N/A',
-                Icons.checkroom_outlined,
+                title.contains('MAILLOT') ? Icons.checkroom_outlined : Icons.vpn_key_outlined,
                 themeColor,
                 () async {
                   final confirm = await _showConfirmDelete(context, data['memberName']);
@@ -241,11 +195,10 @@ class AdminOrdersScreen extends StatelessWidget {
               decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(8)),
               child: Text(trailing, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 12)),
             ),
-            if (onDelete != null) 
-              IconButton(
-                icon: Icon(Icons.close_rounded, color: Colors.red.shade300, size: 20),
-                onPressed: onDelete,
-              ),
+            IconButton(
+              icon: Icon(Icons.close_rounded, color: Colors.red.shade300, size: 20),
+              onPressed: onDelete,
+            ),
           ],
         ),
       ),
@@ -306,7 +259,6 @@ class AdminOrdersScreen extends StatelessWidget {
 
   Widget _buildStatsByZone(List<QueryDocumentSnapshot> orders) {
     Map<int, Map<String, int>> zoneProductStats = {};
-    Map<int, Map<String, int>> zoneSizeStats = {};
     
     for (var doc in orders) {
       final data = doc.data() as Map<String, dynamic>;
@@ -316,9 +268,6 @@ class AdminOrdersScreen extends StatelessWidget {
       zoneProductStats.putIfAbsent(zone, () => {'Maillots': 0, 'Porte-clés': 0});
       if (product.contains('Maillot')) {
         zoneProductStats[zone]!['Maillots'] = (zoneProductStats[zone]!['Maillots'] ?? 0) + 1;
-        final size = data['size'] ?? 'Unknown';
-        zoneSizeStats.putIfAbsent(zone, () => {});
-        zoneSizeStats[zone]![size] = (zoneSizeStats[zone]![size] ?? 0) + 1;
       } else if (product.contains('Porte-clé')) {
         final qty = data['quantity'] ?? 1;
         zoneProductStats[zone]!['Porte-clés'] = (zoneProductStats[zone]!['Porte-clés'] ?? 0) + (qty as int);

@@ -32,6 +32,7 @@ class ClubApp extends StatefulWidget {
 
 class _ClubAppState extends State<ClubApp> {
   bool _isAuthenticated = false;
+  bool _isAdmin = false;
 
   @override
   Widget build(BuildContext context) {
@@ -72,14 +73,20 @@ class _ClubAppState extends State<ClubApp> {
       ),
       themeMode: ThemeMode.system,
       home: _isAuthenticated 
-        ? const MainScreen() 
-        : LoginScreen(onLoginSuccess: () => setState(() => _isAuthenticated = true)),
+        ? MainScreen(isAdmin: _isAdmin) 
+        : LoginScreen(onLoginSuccess: (isAdmin) {
+            setState(() {
+              _isAdmin = isAdmin;
+              _isAuthenticated = true;
+            });
+          }),
     );
   }
 }
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  final bool isAdmin;
+  const MainScreen({super.key, required this.isAdmin});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -92,11 +99,11 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     // Hide scanner on Web since it doesn't work well
     final List<Widget> pages = [
-      if (!kIsWeb) const ScannerScreen(),
-      const MembersListScreen(),
+      const ScannerScreen(),
+      MembersListScreen(isAdmin: widget.isAdmin),
       const OrderScreen(),
-      const AdminOrdersScreen(),
-      if (!kIsWeb) const HistoryScreen(),
+      AdminOrdersScreen(isAdmin: widget.isAdmin),
+      const HistoryScreen(),
     ];
 
     return Scaffold(
@@ -143,34 +150,32 @@ class _MainScreenState extends State<MainScreen> {
           });
         },
         indicatorColor: Colors.red.withOpacity(0.2),
-        destinations: [
-          if (!kIsWeb)
-            const NavigationDestination(
-              icon: Icon(Icons.qr_code_scanner),
-              selectedIcon: Icon(Icons.camera_alt, color: Colors.red),
-              label: 'Scanner',
-            ),
-          const NavigationDestination(
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.qr_code_scanner),
+            selectedIcon: Icon(Icons.camera_alt, color: Colors.white),
+            label: 'Scanner',
+          ),
+          NavigationDestination(
             icon: Icon(Icons.people_outline),
-            selectedIcon: Icon(Icons.people, color: Colors.red),
+            selectedIcon: Icon(Icons.people, color: Colors.white),
             label: 'ZONES',
           ),
-          const NavigationDestination(
+          NavigationDestination(
             icon: Icon(Icons.shopping_bag_outlined),
-            selectedIcon: Icon(Icons.shopping_bag, color: Colors.red),
+            selectedIcon: Icon(Icons.shopping_bag, color: Colors.white),
             label: 'BOUTIQUE',
           ),
-          const NavigationDestination(
+          NavigationDestination(
             icon: Icon(Icons.shopping_cart_checkout_outlined),
-            selectedIcon: Icon(Icons.shopping_cart_checkout, color: Colors.red),
+            selectedIcon: Icon(Icons.shopping_cart_checkout, color: Colors.white),
             label: 'COMMANDE', 
           ),
-          if (!kIsWeb)
-            const NavigationDestination(
-              icon: Icon(Icons.history_outlined),
-              selectedIcon: Icon(Icons.history, color: Colors.red),
-              label: 'Historique',
-            ),
+          NavigationDestination(
+            icon: Icon(Icons.history_outlined),
+            selectedIcon: Icon(Icons.history, color: Colors.white),
+            label: 'Historique',
+          ),
         ],
       ),
     );

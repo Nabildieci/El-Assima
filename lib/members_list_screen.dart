@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MembersListScreen extends StatefulWidget {
-  const MembersListScreen({super.key});
+  final bool isAdmin;
+  const MembersListScreen({super.key, required this.isAdmin});
 
   @override
   State<MembersListScreen> createState() => _MembersListScreenState();
@@ -151,12 +152,13 @@ class _MembersListScreenState extends State<MembersListScreen> {
                           "MEMBRES DE LA ZONE ($_selectedZone)",
                           style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: Colors.blueGrey),
                         ),
-                        TextButton.icon(
-                          onPressed: _resetAttendance,
-                          icon: const Icon(Icons.refresh, size: 16),
-                          label: const Text("REINIT.", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                          style: TextButton.styleFrom(foregroundColor: Colors.red),
-                        ),
+                        if (widget.isAdmin)
+                          TextButton.icon(
+                            onPressed: _resetAttendance,
+                            icon: const Icon(Icons.refresh, size: 16),
+                            label: const Text("REINIT.", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                            style: TextButton.styleFrom(foregroundColor: Colors.red),
+                          ),
                       ],
                     ),
                   ),

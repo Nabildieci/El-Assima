@@ -3,8 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:csv/csv.dart';
 import 'package:share_plus/share_plus.dart';
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class HistoryScreen extends StatefulWidget {
@@ -74,19 +72,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
     String csvData = const ListToCsvConverter().convert(rows);
 
-    if (kIsWeb) {
-      // Direct download for Web via sharing (Share handles it properly without dart:io)
-      await Share.share(csvData, subject: 'Historique_Scans.csv');
-    } else {
-      // Mobile handling via dart:io (safely scoped)
-      final directory = await getTemporaryDirectory();
-      final path = "${directory.path}/Historique_Scans.csv";
-      // We use a local helper to avoid top-level dart:io imports if possible, 
-      // but since it's inside an else block of kIsWeb, it's generally okay for compilers.
-      // However, to be extra safe, we'll just use the share directly if it supports it.
-      await File(path).writeAsString(csvData);
-      await Share.shareXFiles([XFile(path)], text: 'Exportation de l\'historique des scans.');
-    }
+    // Platform-safe sharing
+    await Share.share(csvData, subject: 'Historique_Scans.csv');
   }
 
   @override
@@ -112,7 +99,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.download, color: Colors.greenAccent),
-                    tooltip: "Exporter en CSV (Excel)",
+                    tooltip: "Exporter en CSV",
                     onPressed: _exportToCSV,
                   ),
                   IconButton(
