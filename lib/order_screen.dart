@@ -196,7 +196,7 @@ class _OrderScreenState extends State<OrderScreen> {
                   style: const TextStyle(fontWeight: FontWeight.bold),
                   decoration: InputDecoration(
                     labelText: "Identifiant Membre",
-                    hintText: "Ex (Laroui Laroui Souheib): Laroui Souheib",
+                    hintText: "Saisir ici : AC010",
                     prefixIcon: const Icon(Icons.badge_outlined),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
                     filled: true,

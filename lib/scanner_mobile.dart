@@ -124,6 +124,15 @@ class _ScannerPlatformImplementationState extends State<ScannerPlatformImplement
       for (var rawId in candidates) {
         final searchId = rawId.replaceAll(RegExp(r'[^A-Z0-9]'), '').toUpperCase();
         if (searchId.isEmpty) continue;
+        
+        // 1. Recherche par ID direct (comme la Boutique)
+        final docRef = await FirebaseFirestore.instance.collection('members').doc(searchId).get();
+        if (docRef.exists) {
+          foundDoc = docRef;
+          break;
+        }
+        
+        // 2. Recherche par champ (Fallback)
         var querySnapshot = await FirebaseFirestore.instance.collection('members').where('cardId', isEqualTo: searchId).get();
         if (querySnapshot.docs.isNotEmpty) {
           foundDoc = querySnapshot.docs.first;
