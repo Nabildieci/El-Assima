@@ -137,7 +137,7 @@ class _MainScreenState extends State<MainScreen> {
           image: DecorationImage(
             image: AssetImage("assets/images/arriere_plan.jpg"),
             fit: BoxFit.cover,
-            opacity: 0.15,
+            opacity: 0.10,
           ),
         ),
         child: pages[_currentIndex],

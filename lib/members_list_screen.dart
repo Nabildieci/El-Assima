@@ -46,6 +46,10 @@ class _MembersListScreenState extends State<MembersListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBgColor = isDark ? Colors.grey[900] : Colors.white;
+    final textColor = isDark ? Colors.white : Colors.black;
+
     return Column(
       children: [
         // Header
@@ -123,14 +127,10 @@ class _MembersListScreenState extends State<MembersListScreen> {
                     margin: const EdgeInsets.all(20),
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.grey.shade100, Colors.white],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
+                      color: cardBgColor,
                       borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: Colors.grey.shade200),
-                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 20)],
+                      border: Border.all(color: isDark ? Colors.white10 : Colors.grey.shade200),
+                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10)],
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -150,7 +150,7 @@ class _MembersListScreenState extends State<MembersListScreen> {
                       children: [
                         Text(
                           "MEMBRES DE LA ZONE ($_selectedZone)",
-                          style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: Colors.blueGrey),
+                          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: isDark ? Colors.white70 : Colors.blueGrey),
                         ),
                         if (widget.isAdmin)
                           TextButton.icon(
@@ -174,36 +174,33 @@ class _MembersListScreenState extends State<MembersListScreen> {
                         return Container(
                           margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                           decoration: BoxDecoration(
-                            color: isPresent ? Colors.green.withOpacity(0.03) : Colors.white,
+                            color: isPresent ? Colors.green.withOpacity(0.1) : cardBgColor,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: isPresent ? Colors.green.withOpacity(0.3) : Colors.grey.shade100,
+                              color: isPresent ? Colors.green.withOpacity(0.5) : (isDark ? Colors.white12 : Colors.grey.shade100),
                               width: 1.5,
                             ),
                           ),
                           child: ListTile(
                             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                            leading: Stack(
-                              children: [
-                                CircleAvatar(
-                                  backgroundColor: isPresent ? Colors.green.withOpacity(0.2) : Colors.grey.shade100,
-                                  child: Icon(
-                                    isPresent ? Icons.person : Icons.person_outline,
-                                    color: isPresent ? Colors.green : Colors.grey,
-                                  ),
-                                ),
-                                if (isPresent)
-                                  const Positioned(
-                                    right: 0, bottom: 0,
-                                    child: CircleAvatar(radius: 6, backgroundColor: Colors.white, child: CircleAvatar(radius: 4, backgroundColor: Colors.green)),
-                                  ),
-                              ],
+                            leading: CircleAvatar(
+                              backgroundColor: isPresent ? Colors.green.withOpacity(0.2) : (isDark ? Colors.white10 : Colors.grey.shade100),
+                              child: Icon(
+                                isPresent ? Icons.person : Icons.person_outline,
+                                color: isPresent ? Colors.green : (isDark ? Colors.white54 : Colors.grey),
+                              ),
                             ),
                             title: Text(
                               member['name'] ?? 'Inconnu',
-                              style: TextStyle(fontWeight: FontWeight.bold, color: isPresent ? Colors.green.shade800 : Colors.black),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold, 
+                                color: isPresent ? Colors.green : textColor
+                              ),
                             ),
-                            subtitle: Text("ID: ${member['cardId'] ?? 'N/A'}", style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+                            subtitle: Text(
+                              "ID: ${member['cardId'] ?? 'N/A'}", 
+                              style: TextStyle(fontSize: 12, color: isDark ? Colors.white38 : Colors.grey.shade600)
+                            ),
                             trailing: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
