@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="EL ASSIMA - Portail Officiel et Système de Gestion">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>EL ASSIMA HUB | Officiel</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --red: #D32F2F;
+      --red-bright: #FF1744;
+      --black: #050505;
+      --dark: #0f0f0f;
+      --card: #161616;
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #ffffff;
+      --text-dim: #a0a0a0;
+      --gold: #FFD700;
+      --success: #00E676;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--black);
+      color: var(--text);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Background pattern */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background: 
+        radial-gradient(circle at 20% 30%, rgba(211, 47, 47, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(211, 47, 47, 0.1) 0%, transparent 40%);
+      z-index: -1;
+    }
+
+    /* --- HERO PORTAL --- */
+    .portal-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 3rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .brand-logo {
+      width: 50px;
+      height: 50px;
+      background: white;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 20px rgba(211, 47, 47, 0.4);
+    }
+
+    .brand-logo img { width: 35px; height: 35px; }
+
+    .brand-text {
+      font-weight: 900;
+      font-size: 1.5rem;
+      letter-spacing: 2px;
+      font-style: italic;
+      background: linear-gradient(to right, #fff, var(--red));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Status Bar */
+    .status-hub {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .status-item {
+      background: var(--card);
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 10px var(--success); }
+
+    /* Main Grid */
+    .hub-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      flex: 1;
+    }
+
+    /* Hub Cards */
+    .hub-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 2rem;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hub-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 4px;
+      background: var(--red);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .hub-card:hover {
+      transform: translateY(-10px);
+      border-color: rgba(211,47,47,0.4);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    .hub-card:hover::before { opacity: 1; }
+
+    .hub-icon {
+      font-size: 3rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .hub-title { font-size: 1.6rem; font-weight: 800; margin-bottom: 0.8rem; }
+    .hub-desc { color: var(--text-dim); font-size: 0.95rem; line-height: 1.6; margin-bottom: 2rem; }
+
+    .hub-action {
+      margin-top: auto;
+      text-decoration: none;
+      background: white;
+      color: black;
+      padding: 1rem;
+      text-align: center;
+      border-radius: 12px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+
+    .hub-action.secondary { background: rgba(255,255,255,0.05); color: white; border: 1px solid var(--border); }
+    .hub-action.secondary:hover { background: rgba(255,255,255,0.1); }
+    .hub-action:not(.secondary):hover { background: var(--red); color: white; box-shadow: 0 10px 20px rgba(211,47,47,0.3); }
+
+    /* App Badges */
+    .app-badges {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .badge {
+      background: #000;
+      border: 1px solid var(--border);
+      padding: 0.6rem 1rem;
+      border-radius: 10px;
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.75rem; color: white;
+      flex: 1; justify-content: center;
+    }
+
+    /* Live Counter */
+    .live-stats {
+      background: linear-gradient(135deg, #1a0000, #000);
+      border-radius: 20px;
+      padding: 1.5rem;
+      margin-top: 3rem;
+      border: 1px solid rgba(211,47,47,0.2);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+
+    .stat-box { text-align: center; }
+    .stat-val { font-size: 2.5rem; font-weight: 900; color: var(--red); display: block; }
+    .stat-lbl { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hub-grid { grid-template-columns: 1fr; }
+      header { flex-direction: column; gap: 1.5rem; text-align: center; }
+      .status-hub { justify-content: center; }
+    }
+
+    /* Animations */
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .floating { animation: float 4s ease-in-out infinite; }
+
+  </style>
+</head>
+<body>
+
+  <div class="portal-container">
+    <header>
+      <div class="brand">
+        <div class="brand-logo">
+          <svg width="35" height="35" viewBox="0 0 100 100">
+            <path d="M20 80 L50 20 L80 80" fill="none" stroke="#D32F2F" stroke-width="8" stroke-linecap="round"/>
+            <path d="M35 55 L65 55" stroke="#000" stroke-width="6"/>
+          </svg>
+        </div>
+        <div class="brand-text">EL ASSIMA HUB</div>
+      </div>
+      
+      <div class="status-hub">
+        <div class="status-item">
+          <span class="dot"></span> Système Online
+        </div>
+        <div class="status-item" id="time-display">
+          12:30
+        </div>
+      </div>
+    </header>
+
+    <div class="hub-grid">
+      <!-- SCANNER APP -->
+      <div class="hub-card">
+        <div class="hub-icon">📱</div>
+        <h2 class="hub-title">Application Scanner</h2>
+        <p class="hub-desc">Logiciel mobile de contrôle d'accès en temps réel. Gérez les entrées et validez les membres instantanément.</p>
+        <div class="app-badges">
+          <div class="badge">🤖 Android (App)</div>
+          <div class="badge">🍎 iOS (Web)</div>
+        </div>
+        <a href="index.html" class="hub-action" style="margin-top:1.5rem">Ouvrir l'App Web</a>
+      </div>
+
+      <!-- BOUTIQUE -->
+      <div class="hub-card">
+        <div class="hub-icon">🛍️</div>
+        <h2 class="hub-title">Boutique Officielle</h2>
+        <p class="hub-desc">Commandez vos maillots 2025 et accessoires EL ASSIMA directement. Supportez votre club avec style.</p>
+        <a href="index.html?page=boutique" class="hub-action">Accéder aux Produits</a>
+      </div>
+
+      <!-- ADMIN PANEL -->
+      <div class="hub-card">
+        <div class="hub-icon">🛡️</div>
+        <h2 class="hub-title">Espace Admin</h2>
+        <p class="hub-desc">Statistiques de présence, gestion des commandes et historique complet des événements du club.</p>
+        <a href="index.html?admin=true" class="hub-action secondary">Gérer le Club</a>
+      </div>
+    </div>
+
+    <!-- LIVE STATS -->
+    <div class="live-stats">
+      <div class="stat-box">
+        <span class="stat-val" id="stat-members">--</span>
+        <span class="stat-lbl">Membres Actifs</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-val" id="stat-present">--</span>
+        <span class="stat-lbl">Présents Aujourd'hui</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-val" style="color:var(--gold)">98%</span>
+        <span class="stat-lbl">Satisfaction</span>
+      </div>
+    </div>
+
+    <footer style="margin-top: 4rem; text-align: center; color: var(--text-dim); font-size: 0.8rem; padding: 2rem 0; border-top: 1px solid var(--border);">
+      © 2025 EL ASSIMA. Tous droits réservés. Développé pour la passion.
+    </footer>
+  </div>
+
+  <!-- Firebase SDK (Minimal for Stats) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+
+  <script>
+    // Config matches the user's setup
+    const firebaseConfig = {
+      apiKey: "AIzaSyBgK8ZKmZ0N329vOTfpiAyYAhPu_mhyTAM",
+      appId: "1:179443689337:web:31ca73ac50811b286931a8",
+      projectId: "app-10-1b5fd",
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Time update
+    setInterval(() => {
+      const now = new Date();
+      document.getElementById('time-display').textContent = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+    }, 1000);
+
+    // Live Stats Sync
+    db.collection("members").onSnapshot((snapshot) => {
+      const total = snapshot.size;
+      let present = 0;
+      snapshot.forEach(doc => { if (doc.data().is_present) present++; });
+      
+      document.getElementById('stat-members').textContent = total;
+      document.getElementById('stat-present').textContent = present;
+    });
+  </script>
+</body>
+</html>

@@ -44,19 +44,26 @@ class _OrderScreenState extends State<OrderScreen> {
 
       if (_selectedProduct == 'Maillot') {
         final existingJersey = await FirebaseFirestore.instance
-            .collection('orders')
-            .where('memberId', isEqualTo: memberId)
-            .where('product', isEqualTo: 'Maillot Officiel EL ASSIMA')
-            .get();
-            
-        if (existingJersey.docs.isNotEmpty) {
-          throw "Vous avez déjà commandé un maillot (Limite: 1).";
-        }
+          .collection('orders')
+          .where('memberId', isEqualTo: memberId)
+          .where('product', isEqualTo: 'Maillot Officiel EL ASSIMA')
+          .get();
+          
+      if (_selectedProduct == 'Maillot' && existingJersey.docs.isNotEmpty) {
+        throw "Vous avez déjà commandé un maillot (Limite: 1).";
       }
 
+      final String timeKey = "${DateTime.now().millisecondsSinceEpoch}";
       final orderId = _selectedProduct == 'Maillot' 
           ? memberId 
-          : "${memberId}_KEY_${DateTime.now().millisecondsSinceEpoch}";
+          : "${memberId}_${_selectedProduct.toUpperCase()}_$timeKey";
+          
+      String productName = 'Maillot Officiel EL ASSIMA';
+      int price = 5000;
+      if (_selectedProduct == 'Porte-clé') { productName = 'Porte-clé Officiel'; price = 500; }
+      else if (_selectedProduct == 'Pins') { productName = 'Pins Officiel'; price = 500; }
+      else if (_selectedProduct == 'Stickers') { productName = 'Stickers Officiels'; price = 300; }
+      else if (_selectedProduct == 'Béret') { productName = 'Béret Officiel'; price = 3000; } // Note: 3000 DA used here as typical price
 
       await FirebaseFirestore.instance.collection('orders').doc(orderId).set({
         'memberId': memberId,
@@ -64,8 +71,8 @@ class _OrderScreenState extends State<OrderScreen> {
         'zone': memberDoc.data()?['zone'] ?? 0,
         'size': _selectedProduct == 'Maillot' ? _selectedSize : 'N/A',
         'quantity': _selectedProduct == 'Maillot' ? 1 : _quantity,
-        'product': _selectedProduct == 'Maillot' ? 'Maillot Officiel EL ASSIMA' : 'Porte-clé Officiel',
-        'price': _selectedProduct == 'Maillot' ? 5000 : 500,
+        'product': productName,
+        'price': price,
         'timestamp': FieldValue.serverTimestamp(),
         'status': 'En attente',
       });
@@ -102,7 +109,7 @@ class _OrderScreenState extends State<OrderScreen> {
           ],
         ),
         content: Text(
-          "Votre ${_selectedProduct == 'Maillot' ? 'Maillot' : 'Porte-clé'} a été réservé avec succès.\nRendez-vous au point de retrait.",
+          "Votre $_selectedProduct a été réservé avec succès.\nRendez-vous au point de retrait.",
           textAlign: TextAlign.center,
           style: const TextStyle(fontSize: 16),
         ),
@@ -146,28 +153,67 @@ class _OrderScreenState extends State<OrderScreen> {
           const SizedBox(height: 32),
           
           // Product Cards
-          Row(
-            children: [
-              Expanded(
-                child: _buildEnhancedProductCard(
-                  'Maillot Officiel', 
-                  '5000 DA', 
-                  'assets/images/arriere_plan.jpg', 
-                  _selectedProduct == 'Maillot',
-                  () => setState(() => _selectedProduct = 'Maillot'),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            clipBehavior: Clip.none,
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 160,
+                  child: _buildEnhancedProductCard(
+                    'Maillot', 
+                    '5000 DA', 
+                    'assets/images/arriere_plan.jpg', 
+                    _selectedProduct == 'Maillot',
+                    () => setState(() => _selectedProduct = 'Maillot'),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildEnhancedProductCard(
-                  'Porte-clé', 
-                  '500 DA', 
-                  'assets/images/porte clé new.jpg', 
-                  _selectedProduct == 'Porte-clé',
-                  () => setState(() => _selectedProduct = 'Porte-clé'),
+                const SizedBox(width: 16),
+                SizedBox(
+                  width: 160,
+                  child: _buildEnhancedProductCard(
+                    'Porte-clé', 
+                    '500 DA', 
+                    'assets/images/porte clé new.jpg', 
+                    _selectedProduct == 'Porte-clé',
+                    () => setState(() => _selectedProduct = 'Porte-clé'),
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(width: 16),
+                SizedBox(
+                  width: 160,
+                  child: _buildEnhancedProductCard(
+                    'Pins', 
+                    '500 DA', 
+                    'assets/images/PINS.png', 
+                    _selectedProduct == 'Pins',
+                    () => setState(() => _selectedProduct = 'Pins'),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                SizedBox(
+                  width: 160,
+                  child: _buildEnhancedProductCard(
+                    'Stickers', 
+                    '300 DA', 
+                    'assets/images/STICKERS.jpeg', 
+                    _selectedProduct == 'Stickers',
+                    () => setState(() => _selectedProduct = 'Stickers'),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                SizedBox(
+                  width: 160,
+                  child: _buildEnhancedProductCard(
+                    'Béret', 
+                    '3000 DA', 
+                    'assets/images/Béret 1.jpeg', 
+                    _selectedProduct == 'Béret',
+                    () => setState(() => _selectedProduct = 'Béret'),
+                  ),
+                ),
+              ],
+            ),
           ),
           
           const SizedBox(height: 40),
