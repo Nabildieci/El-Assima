@@ -21,6 +21,8 @@ class _ScannerPlatformImplementationState extends State<ScannerPlatformImplement
   bool _isTorchOn = false;
   bool _showSuccessOverlay = false;
   bool _showErrorOverlay = false;
+  double _currentZoom = 1.0;
+  double _maxZoom = 1.0;
   String _scanResult = "Placez la carte dans le cadre";
   List<CameraDescription> _cameras = [];
   int _selectedCameraIndex = 0;
@@ -35,7 +37,7 @@ class _ScannerPlatformImplementationState extends State<ScannerPlatformImplement
     super.initState();
     _scanLineController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 2),
+      duration: const Duration(seconds: 1), // Plus rapide
     )..repeat(reverse: true);
     _scanLineAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _scanLineController, curve: Curves.easeInOut),
@@ -50,7 +52,6 @@ class _ScannerPlatformImplementationState extends State<ScannerPlatformImplement
         setState(() => _scanResult = "Aucune caméra trouvée.");
         return;
       }
-      // Préférer la caméra arrière
       for (int i = 0; i < _cameras.length; i++) {
         if (_cameras[i].lensDirection == CameraLensDirection.back) {
           _selectedCameraIndex = i;
@@ -67,41 +68,29 @@ class _ScannerPlatformImplementationState extends State<ScannerPlatformImplement
     final camera = _cameras[_selectedCameraIndex];
     _cameraController = CameraController(
       camera,
-      ResolutionPreset.high,
+      ResolutionPreset.max, // Résolution maximum pour plus de détails
       enableAudio: false,
       imageFormatGroup: ImageFormatGroup.jpeg,
     );
     await _cameraController!.initialize();
     
-    // Autofocus continu pour une mise au point nette
+    _maxZoom = await _cameraController!.getMaxZoomLevel();
+    // Zoom automatique à 2.0x pour éviter de s'approcher trop (évite le flou macro)
+    _currentZoom = (_maxZoom > 2.0) ? 2.0 : 1.0;
+    await _cameraController!.setZoomLevel(_currentZoom);
+    
     await _cameraController!.setFocusMode(FocusMode.auto);
     await _cameraController!.setExposureMode(ExposureMode.auto);
 
     if (!mounted) return;
     setState(() => _isCameraInitialized = true);
 
-    // Scan automatique toutes les 2.5 secondes
-    _autoScanTimer = Timer.periodic(const Duration(milliseconds: 2500), (_) {
-      if (!_isScanning && _isCameraInitialized) _scanImage();
+    // Scan plus fréquent (toutes les 1.5 secondes)
+    _autoScanTimer = Timer.periodic(const Duration(milliseconds: 1500), (_) {
+      if (!_isScanning && _isCameraInitialized && !_showSuccessOverlay && !_showErrorOverlay) {
+        _scanImage();
+      }
     });
-  }
-
-  Future<void> _toggleCamera() async {
-    if (_cameras.length < 2) return;
-    _autoScanTimer?.cancel();
-    _selectedCameraIndex = (_selectedCameraIndex + 1) % _cameras.length;
-    await _cameraController?.dispose();
-    _cameraController = null;
-    setState(() => _isCameraInitialized = false);
-    await _startCamera();
-  }
-
-  Future<void> _toggleTorch() async {
-    try {
-      _isTorchOn = !_isTorchOn;
-      await _cameraController?.setFlashMode(_isTorchOn ? FlashMode.torch : FlashMode.off);
-      setState(() {});
-    } catch (_) {}
   }
 
   Future<void> _scanImage() async {
@@ -111,11 +100,6 @@ class _ScannerPlatformImplementationState extends State<ScannerPlatformImplement
     setState(() => _isScanning = true);
 
     try {
-      // Forcer l'autofocus avant de scanner
-      await _cameraController!.setFocusMode(FocusMode.locked);
-      await Future.delayed(const Duration(milliseconds: 300));
-      await _cameraController!.setFocusMode(FocusMode.auto);
-
       final image = await _cameraController!.takePicture();
       final inputImage = InputImage.fromFilePath(image.path);
       final RecognizedText recognizedText = await _textRecognizer.processImage(inputImage);
@@ -126,37 +110,30 @@ class _ScannerPlatformImplementationState extends State<ScannerPlatformImplement
       }
 
       final allText = recognizedText.text.toUpperCase();
-      
-      // Extraction intelligente des matricules (format AC001, USMA123, etc.)
       final RegExp matriculeRegex = RegExp(r'\b[A-Z]{1,4}[0-9]{1,5}\b');
       final List<String> candidates = [];
 
       for (final block in recognizedText.blocks) {
         for (final line in block.lines) {
-          final cleaned = line.text.toUpperCase().replaceAll(RegExp(r'[^A-Z0-9]'), '');
-          final matches = matriculeRegex.allMatches(line.text.toUpperCase());
+          final text = line.text.toUpperCase();
+          final matches = matriculeRegex.allMatches(text);
           for (final m in matches) {
             final val = m.group(0)!.replaceAll(RegExp(r'[^A-Z0-9]'), '');
-            if (!candidates.contains(val) && val.length >= 3) candidates.add(val);
+            if (!candidates.contains(val)) candidates.add(val);
           }
-          if (cleaned.length >= 3 && cleaned.length <= 10 && !candidates.contains(cleaned)) {
-            candidates.add(cleaned);
+          // Nettoyage agressif pour trouver des codes qui pourraient être mal lus
+          final cleaned = text.replaceAll(RegExp(r'[^A-Z0-9]'), '');
+          if (cleaned.length >= 4 && cleaned.length <= 8) {
+            if (!candidates.contains(cleaned)) candidates.add(cleaned);
           }
         }
-      }
-
-      // Aussi chercher dans le texte brut
-      final rawMatches = matriculeRegex.allMatches(allText);
-      for (final m in rawMatches) {
-        final val = m.group(0)!.replaceAll(RegExp(r'[^A-Z0-9]'), '');
-        if (!candidates.contains(val) && val.length >= 3) candidates.add(val);
       }
 
       if (candidates.isNotEmpty) {
         await _verifyMember(candidates);
       }
     } catch (e) {
-      // Silencieux pour ne pas perturber le scan auto
+      debugPrint("Scanner Error: $e");
     } finally {
       if (mounted) setState(() => _isScanning = false);
     }
@@ -165,12 +142,10 @@ class _ScannerPlatformImplementationState extends State<ScannerPlatformImplement
   Future<void> _verifyMember(List<String> candidates) async {
     try {
       DocumentSnapshot? foundDoc;
-
       for (var rawId in candidates) {
-        final searchId = rawId.replaceAll(RegExp(r'[^A-Z0-9]'), '').toUpperCase();
-        if (searchId.length < 2) continue;
+        final searchId = rawId.trim().toUpperCase();
+        if (searchId.length < 3) continue;
 
-        // Recherche directe par ID du document (le plus rapide et fiable)
         final docRef = await FirebaseFirestore.instance.collection('members').doc(searchId).get();
         if (docRef.exists) {
           foundDoc = docRef;
@@ -182,24 +157,27 @@ class _ScannerPlatformImplementationState extends State<ScannerPlatformImplement
         final data = foundDoc.data() as Map<String, dynamic>;
         final String foundName = data['name'] ?? 'Supporter';
         final String foundZone = (data['zone'] ?? '?').toString();
-        final String foundMatricule = data['matricule'] ?? data['cardId'] ?? foundDoc.id;
-
+        
         if (data['is_present'] ?? false) {
           HapticFeedback.vibrate();
           if (mounted) setState(() {
             _showErrorOverlay = true;
-            _scanResult = "⚠️ DÉJÀ ENTRÉ !\nNOM : $foundName\nZONE : $foundZone";
+            _scanResult = "⚠️ DÉJÀ ENTRÉ !\n$foundName";
           });
-          Future.delayed(const Duration(seconds: 4), () {
+          Future.delayed(const Duration(seconds: 3), () {
             if (mounted) setState(() => _showErrorOverlay = false);
           });
           return;
         }
 
-        await foundDoc.reference.update({'is_present': true, 'last_scanned': FieldValue.serverTimestamp()});
+        await foundDoc.reference.update({
+          'is_present': true, 
+          'last_scanned': FieldValue.serverTimestamp()
+        });
+        
         await FirebaseFirestore.instance.collection('scans_history').add({
           'name': foundName,
-          'cardId': foundMatricule,
+          'cardId': foundDoc.id,
           'zone': foundZone,
           'timestamp': FieldValue.serverTimestamp(),
         });
@@ -207,64 +185,24 @@ class _ScannerPlatformImplementationState extends State<ScannerPlatformImplement
         HapticFeedback.heavyImpact();
         if (mounted) setState(() {
           _showSuccessOverlay = true;
-          _scanResult = "✅ $foundName\nZONE : $foundZone";
+          _scanResult = "✅ BIENVENU $foundName";
         });
-        Future.delayed(const Duration(seconds: 3), () {
+        Future.delayed(const Duration(seconds: 2), () {
           if (mounted) setState(() => _showSuccessOverlay = false);
         });
       }
     } catch (e) {
-      // Silencieux
+      debugPrint("Verify Error: $e");
     }
   }
 
-  Future<void> _showManualSearchDialog() async {
-    final TextEditingController searchController = TextEditingController();
-    bool isLoading = false;
-
-    final result = await showDialog<String>(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: const Row(
-            children: [
-              Icon(Icons.search, color: Colors.red),
-              SizedBox(width: 8),
-              Text("Saisir Matricule", style: TextStyle(fontWeight: FontWeight.bold)),
-            ],
-          ),
-          content: TextField(
-            controller: searchController,
-            autofocus: true,
-            textCapitalization: TextCapitalization.characters,
-            decoration: InputDecoration(
-              labelText: "Matricule (ex: AC010)",
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              prefixIcon: const Icon(Icons.badge_outlined),
-            ),
-            onSubmitted: (v) => Navigator.pop(context, v.trim().toUpperCase()),
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text("ANNULER")),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
-              onPressed: () => Navigator.pop(context, searchController.text.trim().toUpperCase()),
-              child: const Text("RECHERCHER"),
-            ),
-          ],
-        ),
-      ),
-    );
-
-    if (result != null && result.isNotEmpty) {
-      setState(() {
-        _isScanning = true;
-        _scanResult = "Vérification de $result...";
-      });
-      await _verifyMember([result]);
-      setState(() => _isScanning = false);
-    }
+  Future<void> _handleTapToFocus(TapDownDetails details, BoxConstraints constraints) async {
+    if (_cameraController == null) return;
+    final offset = details.localPosition;
+    final point = Offset(offset.dx / constraints.maxWidth, offset.dy / constraints.maxHeight);
+    await _cameraController!.setFocusPoint(point);
+    await _cameraController!.setExposurePoint(point);
+    HapticFeedback.selectionClick();
   }
 
   @override
@@ -278,204 +216,184 @@ class _ScannerPlatformImplementationState extends State<ScannerPlatformImplement
 
   @override
   Widget build(BuildContext context) {
-    if (!_isCameraInitialized) {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(color: Colors.red),
-            SizedBox(height: 16),
-            Text("Initialisation de la caméra..."),
-          ],
-        ),
-      );
-    }
+    if (!_isCameraInitialized) return const Center(child: CircularProgressIndicator(color: Colors.red));
 
-    return Stack(
-      children: [
-        // Camera full screen
-        Positioned.fill(child: CameraPreview(_cameraController!)),
-
-        // Overlay sombre avec cadre de scan
-        Positioned.fill(
-          child: CustomPaint(
-            painter: _ScanFramePainter(
-              successOverlay: _showSuccessOverlay,
-              errorOverlay: _showErrorOverlay,
-            ),
-          ),
-        ),
-
-        // Ligne de scan animée dans le cadre
-        if (!_showSuccessOverlay && !_showErrorOverlay)
-          AnimatedBuilder(
-            animation: _scanLineAnimation,
-            builder: (context, child) {
-              final screenH = MediaQuery.of(context).size.height;
-              final frameTop = screenH * 0.28;
-              final frameH = screenH * 0.22;
-              return Positioned(
-                top: frameTop + (_scanLineAnimation.value * frameH),
-                left: MediaQuery.of(context).size.width * 0.1,
-                right: MediaQuery.of(context).size.width * 0.1,
-                child: Container(
-                  height: 2,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.transparent, Colors.red.shade400, Colors.transparent],
-                    ),
-                    boxShadow: [BoxShadow(color: Colors.red.withOpacity(0.5), blurRadius: 6)],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return GestureDetector(
+          onTapDown: (details) => _handleTapToFocus(details, constraints),
+          child: Stack(
+            children: [
+              Positioned.fill(child: CameraPreview(_cameraController!)),
+              
+              // Frame Overlay
+              Positioned.fill(
+                child: CustomPaint(
+                  painter: _ScanFramePainter(
+                    success: _showSuccessOverlay,
+                    error: _showErrorOverlay,
                   ),
                 ),
-              );
-            },
-          ),
+              ),
 
-        // Overlay succès / erreur
-        if (_showSuccessOverlay)
-          Positioned.fill(
-            child: Container(
-              color: Colors.green.withOpacity(0.7),
-              child: const Center(
-                child: Icon(Icons.check_circle_outline, color: Colors.white, size: 120),
-              ),
-            ),
-          ),
-        if (_showErrorOverlay)
-          Positioned.fill(
-            child: Container(
-              color: Colors.red.withOpacity(0.7),
-              child: const Center(
-                child: Icon(Icons.cancel_outlined, color: Colors.white, size: 120),
-              ),
-            ),
-          ),
+              // Animated Scan Line
+              if (!_showSuccessOverlay && !_showErrorOverlay)
+                AnimatedBuilder(
+                  animation: _scanLineAnimation,
+                  builder: (context, child) {
+                    final h = constraints.maxHeight;
+                    final top = h * 0.35;
+                    final frameH = h * 0.25;
+                    return Positioned(
+                      top: top + (_scanLineAnimation.value * frameH),
+                      left: constraints.maxWidth * 0.15,
+                      right: constraints.maxWidth * 0.15,
+                      child: Container(
+                        height: 3,
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          boxShadow: [BoxShadow(color: Colors.red.withOpacity(0.8), blurRadius: 10, spreadRadius: 2)],
+                        ),
+                      ),
+                    );
+                  },
+                ),
 
-        // Boutons droite (torche + caméra + manuel)
-        Positioned(
-          top: 16, right: 16,
-          child: Column(
-            children: [
-              _controlButton(
-                icon: _isTorchOn ? Icons.flash_on : Icons.flash_off,
-                color: _isTorchOn ? Colors.yellow : Colors.white,
-                onTap: _toggleTorch,
+              // UI Buttons
+              Positioned(
+                top: 50, right: 20,
+                child: Column(
+                  children: [
+                    _iconButton(
+                      _isTorchOn ? Icons.flash_on : Icons.flash_off, 
+                      () async {
+                        _isTorchOn = !_isTorchOn;
+                        await _cameraController?.setFlashMode(_isTorchOn ? FlashMode.torch : FlashMode.off);
+                        setState(() {});
+                      },
+                      color: _isTorchOn ? Colors.yellow : Colors.white
+                    ),
+                    const SizedBox(height: 20),
+                    _iconButton(Icons.zoom_in, () async {
+                      _currentZoom = (_currentZoom + 0.5).clamp(1.0, _maxZoom);
+                      await _cameraController?.setZoomLevel(_currentZoom);
+                      setState(() {});
+                    }),
+                    const SizedBox(height: 20),
+                    _iconButton(Icons.zoom_out, () async {
+                      _currentZoom = (_currentZoom - 0.5).clamp(1.0, _maxZoom);
+                      await _cameraController?.setZoomLevel(_currentZoom);
+                      setState(() {});
+                    }),
+                    const SizedBox(height: 20),
+                    _iconButton(Icons.keyboard, () async {
+                      final TextEditingController searchController = TextEditingController();
+                      final result = await showDialog<String>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text("Entrer Matricule"),
+                          content: TextField(
+                            controller: searchController,
+                            autofocus: true,
+                            textCapitalization: TextCapitalization.characters,
+                            decoration: const InputDecoration(hintText: "Ex: AC010"),
+                          ),
+                          actions: [
+                            TextButton(onPressed: () => Navigator.pop(context), child: const Text("Annuler")),
+                            ElevatedButton(
+                              onPressed: () => Navigator.pop(context, searchController.text.trim().toUpperCase()),
+                              child: const Text("Valider"),
+                            ),
+                          ],
+                        ),
+                      );
+                      if (result != null && result.isNotEmpty) _verifyMember([result]);
+                    }),
+                  ],
+                ),
               ),
-              const SizedBox(height: 12),
-              if (_cameras.length > 1)
-                _controlButton(icon: Icons.flip_camera_ios, color: Colors.white, onTap: _toggleCamera),
-              const SizedBox(height: 12),
-              _controlButton(icon: Icons.keyboard_alt_outlined, color: Colors.white, onTap: _showManualSearchDialog),
+
+              // Result Banner
+              Positioned(
+                bottom: 40, left: 20, right: 20,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.black87,
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(color: Colors.white24),
+                  ),
+                  child: Text(
+                    _scanResult,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
             ],
           ),
-        ),
-
-        // Texte résultat en bas
-        Positioned(
-          bottom: 0, left: 0, right: 0,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.bottomCenter,
-                end: Alignment.topCenter,
-                colors: [Colors.black.withOpacity(0.9), Colors.transparent],
-              ),
-            ),
-            child: Column(
-              children: [
-                Text(
-                  _scanResult,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    shadows: [Shadow(color: Colors.black, blurRadius: 8)],
-                  ),
-                ),
-                const SizedBox(height: 8),
-                if (_isScanning)
-                  const SizedBox(
-                    height: 3,
-                    child: LinearProgressIndicator(color: Colors.red, backgroundColor: Colors.white24),
-                  ),
-              ],
-            ),
-          ),
-        ),
-      ],
+        );
+      }
     );
   }
 
-  Widget _controlButton({required IconData icon, required Color color, required VoidCallback onTap}) {
+  Widget _iconButton(IconData icon, VoidCallback onTap, {Color color = Colors.white}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: Colors.black54,
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white24),
-        ),
-        child: Icon(icon, color: color, size: 24),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(color: Colors.black54, shape: BoxShape.circle),
+        child: Icon(icon, color: color, size: 28),
       ),
     );
   }
 }
 
 class _ScanFramePainter extends CustomPainter {
-  final bool successOverlay;
-  final bool errorOverlay;
-  const _ScanFramePainter({required this.successOverlay, required this.errorOverlay});
+  final bool success;
+  final bool error;
+  _ScanFramePainter({required this.success, required this.error});
 
   @override
   void paint(Canvas canvas, Size size) {
-    final frameW = size.width * 0.8;
-    final frameH = size.height * 0.22;
-    final frameLeft = (size.width - frameW) / 2;
-    final frameTop = size.height * 0.28;
-    final frameRect = Rect.fromLTWH(frameLeft, frameTop, frameW, frameH);
-    final rrect = RRect.fromRectAndRadius(frameRect, const Radius.circular(16));
+    final paint = Paint()
+      ..color = Colors.black.withOpacity(0.6)
+      ..style = PaintingStyle.fill;
 
-    // Assombrir tout sauf le cadre
-    final overlayPaint = Paint()..color = Colors.black.withOpacity(0.55);
-    final fullRect = Rect.fromLTWH(0, 0, size.width, size.height);
-    final path = Path()
-      ..addRect(fullRect)
-      ..addRRect(rrect)
-      ..fillType = PathFillType.evenOdd;
-    canvas.drawPath(path, overlayPaint);
+    final frameW = size.width * 0.75;
+    final frameH = size.height * 0.25;
+    final left = (size.width - frameW) / 2;
+    final top = size.height * 0.35;
+    final frame = Rect.fromLTWH(left, top, frameW, frameH);
 
-    // Couleur du cadre selon l'état
-    Color frameColor = successOverlay ? Colors.green : (errorOverlay ? Colors.red : Colors.white);
+    // Overlay with hole
+    final path = Path()..addRect(Rect.fromLTWH(0, 0, size.width, size.height));
+    path.addRRect(RRect.fromRectAndRadius(frame, const Radius.circular(20)));
+    path.fillType = PathFillType.evenOdd;
+    canvas.drawPath(path, paint);
 
-    // Coins du cadre
-    final cornerPaint = Paint()
-      ..color = frameColor
+    // Border
+    final borderPaint = Paint()
+      ..color = success ? Colors.green : (error ? Colors.red : Colors.white)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 3
-      ..strokeCap = StrokeCap.round;
-
-    const cornerLen = 28.0;
-    final corners = [
-      [frameLeft, frameTop],
-      [frameLeft + frameW, frameTop],
-      [frameLeft, frameTop + frameH],
-      [frameLeft + frameW, frameTop + frameH],
-    ];
-
-    for (int i = 0; i < corners.length; i++) {
-      final x = corners[i][0];
-      final y = corners[i][1];
-      final dx = i % 2 == 0 ? cornerLen : -cornerLen;
-      final dy = i < 2 ? cornerLen : -cornerLen;
-      canvas.drawLine(Offset(x, y), Offset(x + dx, y), cornerPaint);
-      canvas.drawLine(Offset(x, y), Offset(x, y + dy), cornerPaint);
+      ..strokeWidth = 4;
+    canvas.drawRRect(RRect.fromRectAndRadius(frame, const Radius.circular(20)), borderPaint);
+    
+    // Corners indicators
+    if (!success && !error) {
+       final cornerPaint = Paint()..color = Colors.red..style = PaintingStyle.stroke..strokeWidth = 8;
+       const cornerSize = 40.0;
+       // Top Left
+       canvas.drawPath(Path()..moveTo(left, top + cornerSize)..lineTo(left, top)..lineTo(left + cornerSize, top), cornerPaint);
+       // Top Right
+       canvas.drawPath(Path()..moveTo(left + frameW - cornerSize, top)..lineTo(left + frameW, top)..lineTo(left + frameW, top + cornerSize), cornerPaint);
+       // Bottom Left
+       canvas.drawPath(Path()..moveTo(left, top + frameH - cornerSize)..lineTo(left, top + frameH)..lineTo(left + cornerSize, top + frameH), cornerPaint);
+       // Bottom Right
+       canvas.drawPath(Path()..moveTo(left + frameW - cornerSize, top + frameH)..lineTo(left + frameW, top + frameH)..lineTo(left + frameW, top + frameH - cornerSize), cornerPaint);
     }
   }
 
   @override
-  bool shouldRepaint(_ScanFramePainter oldDelegate) =>
-      oldDelegate.successOverlay != successOverlay || oldDelegate.errorOverlay != errorOverlay;
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
