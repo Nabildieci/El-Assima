@@ -68,25 +68,23 @@ class _ScannerPlatformImplementationState extends State<ScannerPlatformImplement
       String? foundMatricule;
       final fullText = recognizedText.text.toUpperCase();
       
-      // 1. Recherche stricte par mot
-      for (TextBlock block in recognizedText.blocks) {
-        for (TextLine line in block.lines) {
-          for (TextElement element in line.elements) {
-            final word = element.text.toUpperCase().trim();
-            if (word.length >= 3 && _validMembersList.contains(word)) {
-               foundMatricule = word;
-               break;
-            }
-          }
-          if (foundMatricule != null) break;
-        }
-        if (foundMatricule != null) break;
+      // 1. Oter les espaces pour la vérification robuste
+      final cleanText = fullText.replaceAll(RegExp(r'\s+'), '');
+      
+      // 2. Tenter l'extraction intelligente par motif (2 lettres suivies de chiffres, ex: AC010)
+      // On prend aussi en compte les "O" de l'OCR vus comme des zéros
+      final regex = RegExp(r'([A-Z]{2})([O0-9]{2,4})');
+      final match = regex.firstMatch(cleanText);
+      if (match != null) {
+         // Reconvertir le potentiel 'O' lu par erreur en '0' pour les matricules
+         foundMatricule = match.group(1)! + match.group(2)!.replaceAll('O', '0').replaceAll('Q', '0');
       }
       
-      // 2. Recherche approximative (mots collés)
+      // 3. Fallback : Vérifier par présence stricte si le regex rate
       if (foundMatricule == null) {
+        if (_validMembersList.isEmpty) await _loadMembers();
         for (String validId in _validMembersList) {
-          if (fullText.contains(validId)) {
+          if (cleanText.contains(validId) || fullText.contains(validId)) {
             foundMatricule = validId;
             break;
           }
@@ -99,10 +97,12 @@ class _ScannerPlatformImplementationState extends State<ScannerPlatformImplement
         if (mounted) {
           setState(() {
             _showErrorOverlay = true;
-            _scanResult = "⚠️ AUCUN MATRICULE RECONNU SUR LA CARTE !";
+            // On affiche ce que l'IA a lu pour comprendre l'erreur
+            String lu = cleanText.length > 30 ? "${cleanText.substring(0, 30)}..." : cleanText;
+            _scanResult = "⚠️ INTROUVABLE !\nTexte lu par l'IA :\n$lu";
             _isProcessing = false;
           });
-          Future.delayed(const Duration(seconds: 4), () {
+          Future.delayed(const Duration(seconds: 5), () {
             if (mounted) setState(() { 
               _showErrorOverlay = false;
               _scanResult = "Appuyez sur SCAN pour scanner la carte";
