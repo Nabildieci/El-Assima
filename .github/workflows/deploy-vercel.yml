@@ -5,6 +5,14 @@ on:
     branches:
       - main
       - master
+    paths:
+      - 'lib/**'
+      - 'web/**'
+      - 'assets/**'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+      - 'vercel.json'
+      - '.github/workflows/deploy-vercel.yml'
   workflow_dispatch:
 
 jobs:

@@ -3,6 +3,13 @@ name: CarteNabil-iOS-Build-Final-Fix
 on:
   push:
     branches: [ main, master ]
+    paths:
+      - 'lib/**'
+      - 'ios/**'
+      - 'assets/**'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+      - '.github/workflows/ios.yml'
   workflow_dispatch:
 
 jobs:
