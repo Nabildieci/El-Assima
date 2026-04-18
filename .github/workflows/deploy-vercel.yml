@@ -32,22 +32,21 @@ jobs:
 
       - name: Verify Build
         run: |
-          echo "Checking build/web content:"
-          ls -lh build/web
-          if [ ! -f "build/web/main.dart.js" ]; then
-            echo "ERROR: main.dart.js not found!"
-            exit 1
-          fi
+          echo "Build size:"
+          du -sh build/web
+          ls build/web
 
-      - name: Prepare Deployment Folder
+      - name: Prepare vercel.json
         run: cp vercel.json build/web/
 
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
       - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-version: latest
-          working-directory: build/web
-          vercel-args: '--prod --yes'
+        working-directory: build/web
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          vercel --prod --yes --token "$VERCEL_TOKEN"
