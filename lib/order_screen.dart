@@ -49,8 +49,9 @@ class _OrderScreenState extends State<OrderScreen> {
           .where('product', isEqualTo: 'Maillot Officiel EL ASSIMA')
           .get();
           
-      if (_selectedProduct == 'Maillot' && existingJersey.docs.isNotEmpty) {
-        throw "Vous avez déjà commandé un maillot (Limite: 1).";
+        if (existingJersey.docs.isNotEmpty) {
+          throw "Vous avez déjà commandé un maillot (Limite: 1).";
+        }
       }
 
       final String timeKey = "${DateTime.now().millisecondsSinceEpoch}";
