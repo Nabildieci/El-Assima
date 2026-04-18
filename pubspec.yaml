@@ -18,7 +18,7 @@ dependencies:
   cloud_firestore: ^4.15.5
   
   # Scanner
-  mobile_scanner: ^5.0.0
+  flutter_barcode_scanner: ^2.0.0
   path_provider: ^2.1.2
   shared_preferences: ^2.2.3
   permission_handler: ^11.3.1

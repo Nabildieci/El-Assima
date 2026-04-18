@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
-import 'dart:async';
 
 class ScannerPlatformImplementation extends StatefulWidget {
   const ScannerPlatformImplementation({super.key});
@@ -11,55 +10,30 @@ class ScannerPlatformImplementation extends StatefulWidget {
   State<ScannerPlatformImplementation> createState() => _ScannerPlatformImplementationState();
 }
 
-class _ScannerPlatformImplementationState extends State<ScannerPlatformImplementation>
-    with TickerProviderStateMixin {
-  
-  late MobileScannerController _scannerController;
-  
+class _ScannerPlatformImplementationState extends State<ScannerPlatformImplementation> {
   bool _isProcessing = false;
   bool _showSuccessOverlay = false;
   bool _showErrorOverlay = false;
-  String _scanResult = "Placez la carte dans le cadre";
-  
-  // Animation
-  late AnimationController _scanLineController;
-  late Animation<double> _scanLineAnimation;
+  String _scanResult = "Appuyez sur SCAN pour commencer";
 
-  @override
-  void initState() {
-    super.initState();
-    _scanLineController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 1),
-    )..repeat(reverse: true);
-    _scanLineAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _scanLineController, curve: Curves.easeInOut),
-    );
-    
-    _scannerController = MobileScannerController(
-      detectionSpeed: DetectionSpeed.normal,
-      facing: CameraFacing.back,
-      torchEnabled: false,
-      returnImage: false,
-    );
-  }
-
-  Future<void> _handleBarcode(BarcodeCapture capture) async {
-    if (_isProcessing || _showSuccessOverlay || _showErrorOverlay) return;
-    
-    final List<Barcode> barcodes = capture.barcodes;
-    if (barcodes.isEmpty) return;
-    
-    final String? rawValue = barcodes.first.rawValue;
-    if (rawValue != null && rawValue.trim().isNotEmpty) {
-      if (mounted) {
-        setState(() => _isProcessing = true);
+  Future<void> _scanNative() async {
+    if (_isProcessing) return;
+    try {
+      final barcode = await FlutterBarcodeScanner.scanBarcode(
+          '#D32F2F', 'ANNULER', true, ScanMode.BARCODE);
+          
+      if (barcode != '-1' && barcode.trim().isNotEmpty) {
+         if (mounted) setState(() => _isProcessing = true);
+         await _verifyMember(barcode.trim().toUpperCase());
       }
-      // Pass rawValue to verify
-      await _verifyMember(rawValue.trim().toUpperCase());
+    } on PlatformException {
       if (mounted) {
-        setState(() => _isProcessing = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Erreur lors du lancement du scanner.')),
+        );
       }
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
     }
   }
 
@@ -75,8 +49,11 @@ class _ScannerPlatformImplementationState extends State<ScannerPlatformImplement
             _showErrorOverlay = true;
             _scanResult = "⚠️ MEMBRE INTROUVABLE !\nMatricule: $searchId";
           });
-          Future.delayed(const Duration(seconds: 3), () {
-            if (mounted) setState(() => _showErrorOverlay = false);
+          Future.delayed(const Duration(seconds: 4), () {
+            if (mounted) setState(() { 
+              _showErrorOverlay = false;
+              _scanResult = "Appuyez sur SCAN pour commencer";
+            });
           });
         }
         return;
@@ -92,8 +69,11 @@ class _ScannerPlatformImplementationState extends State<ScannerPlatformImplement
           _showErrorOverlay = true;
           _scanResult = "⚠️ DÉJÀ ENTRÉ !\n$foundName ($searchId)";
         });
-        Future.delayed(const Duration(seconds: 3), () {
-          if (mounted) setState(() => _showErrorOverlay = false);
+        Future.delayed(const Duration(seconds: 4), () {
+          if (mounted) setState(() {
+            _showErrorOverlay = false;
+            _scanResult = "Appuyez sur SCAN pour commencer";
+          });
         });
         return;
       }
@@ -115,12 +95,15 @@ class _ScannerPlatformImplementationState extends State<ScannerPlatformImplement
         _showSuccessOverlay = true;
         _scanResult = "✅ BIENVENU $foundName";
       });
-      Future.delayed(const Duration(seconds: 2), () {
+      Future.delayed(const Duration(seconds: 3), () {
         if (mounted) setState(() {
            _showSuccessOverlay = false;
-           _scanResult = "Placez la carte dans le cadre";
+           _scanResult = "Appuyez sur SCAN pour commencer";
         });
       });
+      
+      // Relancer le scan automatiquement si on veut un flow rapide :
+      // Future.delayed(const Duration(seconds: 1), () => _scanNative());
       
     } catch (e) {
       debugPrint("Verify Error: $e");
@@ -129,188 +112,119 @@ class _ScannerPlatformImplementationState extends State<ScannerPlatformImplement
             _showErrorOverlay = true;
             _scanResult = "⚠️ ERREUR RESEAU !";
           });
-          Future.delayed(const Duration(seconds: 3), () {
-            if (mounted) setState(() => _showErrorOverlay = false);
+          Future.delayed(const Duration(seconds: 4), () {
+            if (mounted) setState(() {
+              _showErrorOverlay = false;
+              _scanResult = "Appuyez sur SCAN pour commencer";
+            });
           });
       }
     }
   }
 
   @override
-  void dispose() {
-    _scanLineController.dispose();
-    _scannerController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Stack(
+    Color statusColor = Colors.grey.shade900;
+    if (_showSuccessOverlay) statusColor = Colors.green.shade800;
+    if (_showErrorOverlay) statusColor = Colors.red.shade900;
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Positioned.fill(
-              child: MobileScanner(
-                controller: _scannerController,
-                onDetect: _handleBarcode,
+            // Status Banner
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+              decoration: BoxDecoration(
+                color: statusColor,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(color: statusColor.withOpacity(0.4), blurRadius: 20, spreadRadius: 2)
+                ]
+              ),
+              child: _isProcessing 
+                ? const Column(
+                    children: [
+                      CircularProgressIndicator(color: Colors.white),
+                      SizedBox(height: 16),
+                      Text("Vérification...", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))
+                    ],
+                  )
+                : Text(
+                    _scanResult,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900),
+                  ),
+            ),
+            
+            const SizedBox(height: 50),
+            
+            // Scan Button
+            GestureDetector(
+              onTap: _scanNative,
+              child: Container(
+                width: 200,
+                height: 200,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(color: Colors.red.withOpacity(0.3), blurRadius: 40, spreadRadius: 10)
+                  ],
+                  border: Border.all(color: Colors.red, width: 8)
+                ),
+                child: const Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.qr_code_scanner, size: 70, color: Colors.black),
+                    SizedBox(height: 10),
+                    Text("SCANNER", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Colors.black)),
+                  ],
+                ),
               ),
             ),
             
-            // Frame Overlay
-            Positioned.fill(
-              child: CustomPaint(
-                painter: _ScanFramePainter(
-                  success: _showSuccessOverlay,
-                  error: _showErrorOverlay,
-                ),
-              ),
-            ),
-
-            // Animated Scan Line
-            if (!_showSuccessOverlay && !_showErrorOverlay)
-              AnimatedBuilder(
-                animation: _scanLineAnimation,
-                builder: (context, child) {
-                  final h = constraints.maxHeight;
-                  final top = h * 0.35;
-                  final frameH = h * 0.25;
-                  return Positioned(
-                    top: top + (_scanLineAnimation.value * frameH),
-                    left: constraints.maxWidth * 0.15,
-                    right: constraints.maxWidth * 0.15,
-                    child: Container(
-                      height: 3,
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        boxShadow: [BoxShadow(color: Colors.red.withOpacity(0.8), blurRadius: 10, spreadRadius: 2)],
-                      ),
+            const SizedBox(height: 40),
+            
+             // Manual Entry Button
+            TextButton.icon(
+              onPressed: () async {
+                final TextEditingController searchController = TextEditingController();
+                final result = await showDialog<String>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text("Entrer Matricule"),
+                    content: TextField(
+                      controller: searchController,
+                      autofocus: true,
+                      textCapitalization: TextCapitalization.characters,
+                      decoration: const InputDecoration(hintText: "Ex: AC010"),
                     ),
-                  );
-                },
-              ),
-
-            // UI Buttons
-            Positioned(
-              top: 50, right: 20,
-              child: Column(
-                children: [
-                  _iconButton(
-                    Icons.flash_on, 
-                    () => _scannerController.toggleTorch(),
-                  ),
-                  const SizedBox(height: 20),
-                  _iconButton(
-                    Icons.cameraswitch_outlined, 
-                    () => _scannerController.switchCamera(),
-                  ),
-                  const SizedBox(height: 20),
-                  _iconButton(Icons.keyboard, () async {
-                    final TextEditingController searchController = TextEditingController();
-                    final result = await showDialog<String>(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text("Entrer Matricule"),
-                        content: TextField(
-                          controller: searchController,
-                          autofocus: true,
-                          textCapitalization: TextCapitalization.characters,
-                          decoration: const InputDecoration(hintText: "Ex: AC010"),
-                        ),
-                        actions: [
-                          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Annuler")),
-                          ElevatedButton(
-                            onPressed: () => Navigator.pop(context, searchController.text.trim().toUpperCase()),
-                            child: const Text("Valider"),
-                          ),
-                        ],
+                    actions: [
+                      TextButton(onPressed: () => Navigator.pop(context), child: const Text("Annuler", style: TextStyle(color: Colors.grey))),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                        onPressed: () => Navigator.pop(context, searchController.text.trim().toUpperCase()),
+                        child: const Text("Valider", style: TextStyle(color: Colors.white)),
                       ),
-                    );
-                    if (result != null && result.isNotEmpty) _verifyMember(result);
-                  }),
-                ],
-              ),
-            ),
-
-            // Result Banner
-            Positioned(
-              bottom: 40, left: 20, right: 20,
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-                decoration: BoxDecoration(
-                  color: Colors.black87,
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: Colors.white24),
-                ),
-                child: Text(
-                  _scanResult,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ),
+                    ],
+                  ),
+                );
+                if (result != null && result.isNotEmpty) {
+                  if (mounted) setState(() => _isProcessing = true);
+                  await _verifyMember(result);
+                }
+              },
+              icon: const Icon(Icons.keyboard, color: Colors.white54),
+              label: const Text("SAISIE MANUELLE", style: TextStyle(color: Colors.white54, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
             ),
           ],
-        );
-      }
-    );
-  }
-
-  Widget _iconButton(IconData icon, VoidCallback onTap, {Color color = Colors.white}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: Colors.black54, shape: BoxShape.circle),
-        child: Icon(icon, color: color, size: 28),
+        ),
       ),
     );
   }
-}
-
-class _ScanFramePainter extends CustomPainter {
-  final bool success;
-  final bool error;
-  _ScanFramePainter({required this.success, required this.error});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.black.withOpacity(0.6)
-      ..style = PaintingStyle.fill;
-
-    final frameW = size.width * 0.75;
-    final frameH = size.height * 0.25;
-    final left = (size.width - frameW) / 2;
-    final top = size.height * 0.35;
-    final frame = Rect.fromLTWH(left, top, frameW, frameH);
-
-    // Overlay with hole
-    final path = Path()..addRect(Rect.fromLTWH(0, 0, size.width, size.height));
-    path.addRRect(RRect.fromRectAndRadius(frame, const Radius.circular(20)));
-    path.fillType = PathFillType.evenOdd;
-    canvas.drawPath(path, paint);
-
-    // Border
-    final borderPaint = Paint()
-      ..color = success ? Colors.green : (error ? Colors.red : Colors.white)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 4;
-    canvas.drawRRect(RRect.fromRectAndRadius(frame, const Radius.circular(20)), borderPaint);
-    
-    // Corners indicators
-    if (!success && !error) {
-       final cornerPaint = Paint()..color = Colors.red..style = PaintingStyle.stroke..strokeWidth = 8;
-       const cornerSize = 40.0;
-       // Top Left
-       canvas.drawPath(Path()..moveTo(left, top + cornerSize)..lineTo(left, top)..lineTo(left + cornerSize, top), cornerPaint);
-       // Top Right
-       canvas.drawPath(Path()..moveTo(left + frameW - cornerSize, top)..lineTo(left + frameW, top)..lineTo(left + frameW, top + cornerSize), cornerPaint);
-       // Bottom Left
-       canvas.drawPath(Path()..moveTo(left, top + frameH - cornerSize)..lineTo(left, top + frameH)..lineTo(left + cornerSize, top + frameH), cornerPaint);
-       // Bottom Right
-       canvas.drawPath(Path()..moveTo(left + frameW - cornerSize, top + frameH)..lineTo(left + frameW, top + frameH)..lineTo(left + frameW, top + frameH - cornerSize), cornerPaint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
