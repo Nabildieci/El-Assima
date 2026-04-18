@@ -14,6 +14,7 @@ class ScannerPlatformImplementation extends StatefulWidget {
 class _ScannerPlatformImplementationState extends State<ScannerPlatformImplementation> {
   final TextRecognizer _textRecognizer = TextRecognizer();
   final ImagePicker _picker = ImagePicker();
+  final TextEditingController _manualController = TextEditingController();
   
   bool _isProcessing = false;
   bool _showSuccessOverlay = false;
@@ -40,6 +41,7 @@ class _ScannerPlatformImplementationState extends State<ScannerPlatformImplement
   @override
   void dispose() {
     _textRecognizer.close();
+    _manualController.dispose();
     super.dispose();
   }
 
@@ -274,37 +276,51 @@ class _ScannerPlatformImplementationState extends State<ScannerPlatformImplement
             
             const SizedBox(height: 40),
             
-             // Manual Entry Button
-            TextButton.icon(
-              onPressed: () async {
-                final TextEditingController searchController = TextEditingController();
-                final result = await showDialog<String>(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text("Entrer Matricule"),
-                    content: TextField(
-                      controller: searchController,
-                      autofocus: true,
+            // Persistent Manual Entry
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(25),
+                border: Border.all(color: Colors.white10)
+              ),
+              child: Column(
+                children: [
+                   const Text("SAISIE MANUELLE", style: TextStyle(color: Colors.white54, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+                   const SizedBox(height: 15),
+                   TextField(
+                      controller: _manualController,
+                      style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
                       textCapitalization: TextCapitalization.characters,
-                      decoration: const InputDecoration(hintText: "Ex: AC010"),
-                    ),
-                    actions: [
-                      TextButton(onPressed: () => Navigator.pop(context), child: const Text("Annuler", style: TextStyle(color: Colors.grey))),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                        onPressed: () => Navigator.pop(context, searchController.text.trim().toUpperCase()),
-                        child: const Text("Valider", style: TextStyle(color: Colors.white)),
+                      decoration: InputDecoration(
+                        hintText: "ExCode: AC010",
+                        hintStyle: const TextStyle(color: Colors.white24, fontSize: 18),
+                        filled: true,
+                        fillColor: Colors.black26,
+                        contentPadding: const EdgeInsets.symmetric(vertical: 20),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                        suffixIcon: IconButton(
+                          icon: const Icon(Icons.check_circle, color: Colors.green, size: 35),
+                          onPressed: () {
+                            if (_manualController.text.isNotEmpty) {
+                              if (mounted) setState(() => _isProcessing = true);
+                              _verifyMember(_manualController.text.trim().toUpperCase());
+                              _manualController.clear();
+                            }
+                          },
+                        )
                       ),
-                    ],
-                  ),
-                );
-                if (result != null && result.isNotEmpty) {
-                  if (mounted) setState(() => _isProcessing = true);
-                  await _verifyMember(result);
-                }
-              },
-              icon: const Icon(Icons.keyboard, color: Colors.white54, size: 28),
-              label: const Text("SAISIE MANUELLE CLAVIER", style: TextStyle(color: Colors.white54, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+                      onSubmitted: (val) {
+                        if (val.isNotEmpty) {
+                          if (mounted) setState(() => _isProcessing = true);
+                          _verifyMember(val.trim().toUpperCase());
+                          _manualController.clear();
+                        }
+                      },
+                   ),
+                ],
+              ),
             ),
           ],
         ),
