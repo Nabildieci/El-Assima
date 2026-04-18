@@ -125,33 +125,11 @@ class _ScannerPlatformImplementationState extends State<ScannerPlatformImplement
         final searchId = rawId.replaceAll(RegExp(r'[^A-Z0-9]'), '').toUpperCase();
         if (searchId.isEmpty) continue;
         
-        // 1. Recherche par ID direct (comme la Boutique)
+        // Recherche UNIQUEMENT par ID direct (identique à la Boutique)
         final docRef = await FirebaseFirestore.instance.collection('members').doc(searchId).get();
         if (docRef.exists) {
           foundDoc = docRef;
           break;
-        }
-        
-        // 2. Recherche par champ (Fallback)
-        var querySnapshot = await FirebaseFirestore.instance.collection('members').where('cardId', isEqualTo: searchId).get();
-        if (querySnapshot.docs.isNotEmpty) {
-          foundDoc = querySnapshot.docs.first;
-          break;
-        }
-        querySnapshot = await FirebaseFirestore.instance.collection('members').where('matricule', isEqualTo: searchId).get();
-        if (querySnapshot.docs.isNotEmpty) {
-          foundDoc = querySnapshot.docs.first;
-          break;
-        }
-      }
-
-      if (foundDoc == null && fullText != null) {
-        final normalizedFull = fullText.toLowerCase();
-        final allMembers = await FirebaseFirestore.instance.collection('members').get();
-        for (var doc in allMembers.docs) {
-          final fullName = (doc.data()['name'] ?? '').toString().toLowerCase();
-          if (fullName.length < 4) continue;
-          if (normalizedFull.contains(fullName)) { foundDoc = doc; break; }
         }
       }
 
@@ -159,7 +137,7 @@ class _ScannerPlatformImplementationState extends State<ScannerPlatformImplement
         final data = foundDoc.data() as Map<String, dynamic>;
         final String foundName = data['name'] ?? 'Supporter';
         final String foundZone = (data['zone'] ?? '?').toString();
-        final String foundMatricule = data['matricule'] ?? data['cardId'] ?? '?';
+        final String foundMatricule = data['matricule'] ?? data['cardId'] ?? foundDoc.id;
         
         if (data['is_present'] ?? false) {
           HapticFeedback.vibrate();
