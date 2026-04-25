@@ -1752,34 +1752,44 @@
       <div class="modal-form">
         <div style="display:flex; gap:1rem;">
           <div class="form-group" style="flex:1">
-            <label>Prénom</label>
-            <input type="text" id="order-firstname" class="form-input" placeholder="Ex: Nabil">
-          </div>
-          <div class="form-group" style="flex:1">
             <label>Nom</label>
             <input type="text" id="order-lastname" class="form-input" placeholder="Ex: USMA">
           </div>
+          <div class="form-group" style="flex:1">
+            <label>Prénom</label>
+            <input type="text" id="order-firstname" class="form-input" placeholder="Ex: Nabil">
+          </div>
         </div>
 
-        <div class="form-group">
-          <label>Zone (Tribune)</label>
-          <select id="order-zone" class="form-select">
-            <option value="">-- Sélectionner --</option>
-            <option value="1">Zone 1</option>
-            <option value="2">Zone 2</option>
-            <option value="3">Zone 3</option>
-            <option value="4">Zone 4</option>
-            <option value="5">Zone 5</option>
-            <option value="6">Zone 6</option>
-            <option value="7">Zone 7</option>
-            <option value="8">Zone 8</option>
-            <option value="9">Zone 9</option>
-            <option value="10">Zone 10</option>
-            <option value="11">Zone 11</option>
-            <option value="12">Zone 12</option>
-            <option value="13">Zone 13</option>
-            <option value="14">Zone 14</option>
-          </select>
+        <div style="display:flex; gap:1rem;">
+          <div class="form-group" style="flex:1">
+            <label>Zone (Tribune)</label>
+            <select id="order-zone" class="form-select">
+              <option value="">-- Sélectionner --</option>
+              <option value="1">Zone 1</option>
+              <option value="2">Zone 2</option>
+              <option value="3">Zone 3</option>
+              <option value="4">Zone 4</option>
+              <option value="5">Zone 5</option>
+              <option value="6">Zone 6</option>
+              <option value="7">Zone 7</option>
+              <option value="8">Zone 8</option>
+              <option value="9">Zone 9</option>
+              <option value="10">Zone 10</option>
+              <option value="11">Zone 11</option>
+              <option value="12">Zone 12</option>
+              <option value="13">Zone 13</option>
+              <option value="14">Zone 14</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex:1">
+            <label>Quantité (Max 3)</label>
+            <select id="order-qty" class="form-select">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -2160,6 +2170,7 @@
       // Reset form
       document.getElementById('order-firstname').value = '';
       document.getElementById('order-lastname').value = '';
+      document.getElementById('order-qty').value = '1';
       
       // Utiliser la zone globale si définie
       const zoneSelect = document.getElementById('order-zone');
@@ -2195,6 +2206,7 @@
       const firstName = document.getElementById('order-firstname').value.trim();
       const lastName = document.getElementById('order-lastname').value.trim();
       const zone = document.getElementById('order-zone').value;
+      const qty = parseInt(document.getElementById('order-qty').value) || 1;
 
       if (!firstName || !lastName || !zone) {
         showToast('⚠️ Complétez Nom, Prénom et Zone', 'error');
@@ -2209,27 +2221,28 @@
       // Envoi direct de la commande vers Firebase avec Infos Client
       const orderId = "CMD_" + Date.now();
       db.collection("orders").doc(orderId).set({
-        client: `${firstName} ${lastName}`,
+        client: `${lastName} ${firstName}`,
         firstName: firstName,
         lastName: lastName,
         zone: zone,
         product: selectedProduct.name,
         size: selectedSize || "N/A",
-        quantity: 1,
+        quantity: qty,
         price: selectedProduct.price,
+        totalPrice: selectedProduct.price * qty,
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
         status: 'En attente'
       }).then(() => {
         cart.push({
           ...selectedProduct,
-          client: `${firstName} ${lastName}`,
+          client: `${lastName} ${firstName}`,
           zone: zone,
           size: selectedSize,
-          qty: 1
+          qty: qty
         });
         closeModal();
         updateCartUI();
-        showToast(`✅ Commande pour ${firstName} validée`, 'success');
+        showToast(`✅ Commande (${qty}) pour ${lastName} validée`, 'success');
       }).catch(e => {
         showToast('❌ Erreur de réseau Firebase', 'error');
         console.error(e);
@@ -2237,15 +2250,16 @@
     }
 
     function updateCartUI() {
-      const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+      const totalQty = cart.reduce((sum, i) => sum + i.qty, 0);
+      const totalPrice = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
       const countEl = document.getElementById('cart-count');
       const totalEl = document.getElementById('cart-total-display');
       const indicator = document.getElementById('cart-indicator');
 
       if (cart.length > 0) {
         indicator.style.display = 'flex';
-        countEl.textContent = cart.length + ' article(s)';
-        totalEl.textContent = total.toLocaleString() + ' DA';
+        countEl.textContent = totalQty + ' article(s)';
+        totalEl.textContent = totalPrice.toLocaleString() + ' DA';
       } else {
         indicator.style.display = 'none';
       }
@@ -2253,11 +2267,11 @@
 
     // ===== ORDERS PAGE =====
     function updateOrdersPage() {
-      const jerseyCount = cart.filter(i => i.type === 'jersey').length;
-      const keyCount = cart.filter(i => i.type === 'keychain').length;
-      const pinsCount = cart.filter(i => i.type === 'pins').length;
-      const stickersCount = cart.filter(i => i.type === 'stickers').length;
-      const beretCount = cart.filter(i => i.type === 'beret').length;
+      const jerseyCount = cart.filter(i => i.type === 'jersey').reduce((s, i) => s + i.qty, 0);
+      const keyCount = cart.filter(i => i.type === 'keychain').reduce((s, i) => s + i.qty, 0);
+      const pinsCount = cart.filter(i => i.type === 'pins').reduce((s, i) => s + i.qty, 0);
+      const stickersCount = cart.filter(i => i.type === 'stickers').reduce((s, i) => s + i.qty, 0);
+      const beretCount = cart.filter(i => i.type === 'beret').reduce((s, i) => s + i.qty, 0);
       const totalAmount = cart.reduce((s, i) => s + i.price * i.qty, 0);
 
       document.getElementById('cmd-jerseys').textContent = jerseyCount;
