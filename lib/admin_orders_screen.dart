@@ -115,8 +115,9 @@ class AdminOrdersScreen extends StatelessWidget {
             itemCount: orders.length,
             itemBuilder: (context, index) {
               final data = orders[index].data() as Map<String, dynamic>;
-              return _buildBaseOrderCard(context, data['memberName'] ?? 'Inconnu', "ID: ${data['memberId']} • Zone ${data['zone']}", data['size'] ?? 'N/A', Icons.checkroom_outlined, Colors.red, cardBg, () async {
-                final confirm = await _showConfirmDelete(context, data['memberName']);
+              final clientName = data['client'] ?? data['memberName'] ?? 'Inconnu';
+              return _buildBaseOrderCard(context, clientName, "Zone ${data['zone']}", data['size'] ?? 'N/A', Icons.checkroom_outlined, Colors.red, cardBg, () async {
+                final confirm = await _showConfirmDelete(context, clientName);
                 if (confirm == true) await FirebaseFirestore.instance.collection('orders').doc(orders[index].id).delete();
               });
             },
@@ -130,10 +131,10 @@ class AdminOrdersScreen extends StatelessWidget {
     Map<String, Map<String, dynamic>> grouped = {};
     for (var doc in orders) {
       final data = doc.data() as Map<String, dynamic>;
-      final mId = data['memberId'] ?? 'unknown';
-      grouped.putIfAbsent(mId, () => {'name': data['memberName'] ?? 'Inconnu', 'zone': data['zone'], 'totalQty': 0, 'docIds': <String>[]});
-      grouped[mId]!['totalQty'] += (data['quantity'] ?? 1) as int;
-      (grouped[mId]!['docIds'] as List<String>).add(doc.id);
+      final clientName = data['client'] ?? data['memberName'] ?? 'Inconnu';
+      grouped.putIfAbsent(clientName, () => {'name': clientName, 'zone': data['zone'], 'totalQty': 0, 'docIds': <String>[]});
+      grouped[clientName]!['totalQty'] += (data['quantity'] ?? 1) as int;
+      (grouped[clientName]!['docIds'] as List<String>).add(doc.id);
     }
     final sortedItems = grouped.values.toList();
     return Column(
@@ -144,7 +145,7 @@ class AdminOrdersScreen extends StatelessWidget {
             itemCount: sortedItems.length,
             itemBuilder: (context, index) {
               final item = sortedItems[index];
-              return _buildBaseOrderCard(context, item['name'], "ID: ${grouped.keys.elementAt(index)} • Zone ${item['zone']}", "${item['totalQty']} PCS", icon, color, cardBg, () async {
+              return _buildBaseOrderCard(context, item['name'], "Zone ${item['zone']}", "${item['totalQty']} PCS", icon, color, cardBg, () async {
                 final confirm = await _showConfirmDelete(context, item['name']);
                 if (confirm == true) {
                   final batch = FirebaseFirestore.instance.batch();
