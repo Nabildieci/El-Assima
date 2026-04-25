@@ -9,6 +9,7 @@ class OrderScreen extends StatefulWidget {
 }
 
 class _OrderScreenState extends State<OrderScreen> {
+  String _selectedProduct = 'Maillot';
   String? _selectedSize;
   int _quantity = 1;
   final TextEditingController _firstNameController = TextEditingController();
