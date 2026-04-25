@@ -53,43 +53,92 @@ class _MembersListScreenState extends State<MembersListScreen> {
     return Column(
       children: [
         // Header (Text "GESTION DES ZONES" REMOVED AS REQUESTED)
+        // GLOBAL STATS SUMMARY
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
-          decoration: BoxDecoration(
+          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+          decoration: const BoxDecoration(
             color: Colors.black,
-            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 10)],
+            boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 10)],
           ),
-          child: Row(
-            children: [
-              const Expanded(
-                child: SizedBox(), // Space where text used to be
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                decoration: BoxDecoration(
-                  color: Colors.red.shade900,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<int>(
-                    value: _selectedZone,
-                    dropdownColor: Colors.black,
-                    icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
-                    items: List.generate(14, (index) => index + 1).map((int value) {
-                      return DropdownMenuItem<int>(
-                        value: value,
-                        child: Text("ZONE $value"),
-                      );
-                    }).toList(),
-                    onChanged: (int? newValue) {
-                      if (newValue != null) setState(() => _selectedZone = newValue);
-                    },
-                  ),
-                ),
-              ),
-            ],
+          child: StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance.collection('members').snapshots(),
+            builder: (context, snapshot) {
+              int total = 0;
+              int present = 0;
+              if (snapshot.hasData) {
+                total = snapshot.data!.docs.length;
+                present = snapshot.data!.docs.where((d) => (d.data() as Map)['is_present'] == true).length;
+              }
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildGlobalStat("TOTAL RÉSERVATIONS", total.toString(), Colors.blue),
+                  Container(width: 1, height: 30, color: Colors.white12),
+                  _buildGlobalStat("PRÉSENTS TOTAL", present.toString(), Colors.red),
+                ],
+              );
+            },
+          ),
+        ),
+
+        // 14 ZONES GRID
+        Container(
+          height: 120, // Reduced height for the horizontal grid
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: 14,
+            itemBuilder: (context, index) {
+              final zoneId = index + 1;
+              final bool isSelected = _selectedZone == zoneId;
+              
+              return StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance.collection('members').where('zone', isEqualTo: zoneId).snapshots(),
+                builder: (context, snapshot) {
+                  int zTotal = 0;
+                  int zPresent = 0;
+                  if (snapshot.hasData) {
+                    zTotal = snapshot.data!.docs.length;
+                    zPresent = snapshot.data!.docs.where((d) => (d.data() as Map)['is_present'] == true).length;
+                  }
+
+                  return GestureDetector(
+                    onTap: () => setState(() => _selectedZone = zoneId),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      width: 90,
+                      margin: const EdgeInsets.only(right: 12),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: isSelected ? Colors.red.shade900 : Colors.grey.shade900,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: isSelected ? Colors.red : Colors.white10),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("ZONE $zoneId", style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 4),
+                          Text("$zPresent/$zTotal", style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w900)),
+                          const SizedBox(height: 6),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(2),
+                            child: LinearProgressIndicator(
+                              value: zTotal > 0 ? zPresent / zTotal : 0,
+                              backgroundColor: Colors.white10,
+                              color: isSelected ? Colors.white : Colors.red,
+                              minHeight: 2,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
           ),
         ),
 
@@ -214,6 +263,16 @@ class _MembersListScreenState extends State<MembersListScreen> {
             },
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildGlobalStat(String label, String value, Color color) {
+    return Column(
+      children: [
+        Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: color)),
+        const SizedBox(height: 4),
+        Text(label, style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 1.2)),
       ],
     );
   }

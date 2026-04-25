@@ -9,20 +9,22 @@ class OrderScreen extends StatefulWidget {
 }
 
 class _OrderScreenState extends State<OrderScreen> {
-  String _selectedProduct = 'Maillot'; // 'Maillot' or 'Porte-clé'
   String? _selectedSize;
   int _quantity = 1;
-  final TextEditingController _memberIdController = TextEditingController();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  String? _selectedZone;
   bool _isSubmitting = false;
 
   final List<String> _sizes = ['S', 'M', 'L', 'XL', 'XXL'];
 
   Future<void> _submitOrder() async {
-    final memberId = _memberIdController.text.trim().toUpperCase();
+    final firstName = _firstNameController.text.trim();
+    final lastName = _lastNameController.text.trim();
     
-    if (memberId.isEmpty) {
+    if (firstName.isEmpty || lastName.isEmpty || _selectedZone == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Veuillez saisir votre ID membre.")),
+        const SnackBar(content: Text("Veuillez saisir Nom, Prénom et Zone.")),
       );
       return;
     }
@@ -37,27 +39,8 @@ class _OrderScreenState extends State<OrderScreen> {
     setState(() => _isSubmitting = true);
 
     try {
-      final memberDoc = await FirebaseFirestore.instance.collection('members').doc(memberId).get();
-      if (!memberDoc.exists) {
-        throw "Membre introuvable. Veuillez vérifier l'ID.";
-      }
-
-      if (_selectedProduct == 'Maillot') {
-        final existingJersey = await FirebaseFirestore.instance
-          .collection('orders')
-          .where('memberId', isEqualTo: memberId)
-          .where('product', isEqualTo: 'Maillot Officiel EL ASSIMA')
-          .get();
-          
-        if (existingJersey.docs.isNotEmpty) {
-          throw "Vous avez déjà commandé un maillot (Limite: 1).";
-        }
-      }
-
       final String timeKey = "${DateTime.now().millisecondsSinceEpoch}";
-      final orderId = _selectedProduct == 'Maillot' 
-          ? memberId 
-          : "${memberId}_${_selectedProduct.toUpperCase()}_$timeKey";
+      final orderId = "CMD_$timeKey";
           
       String productName = 'Maillot Officiel EL ASSIMA';
       int price = 5000;
@@ -67,9 +50,10 @@ class _OrderScreenState extends State<OrderScreen> {
       else if (_selectedProduct == 'Béret') { productName = 'Béret Officiel'; price = 3000; } // Note: 3000 DA used here as typical price
 
       await FirebaseFirestore.instance.collection('orders').doc(orderId).set({
-        'memberId': memberId,
-        'memberName': memberDoc.data()?['name'] ?? 'Inconnu',
-        'zone': memberDoc.data()?['zone'] ?? 0,
+        'client': "$firstName $lastName",
+        'firstName': firstName,
+        'lastName': lastName,
+        'zone': _selectedZone,
         'size': _selectedProduct == 'Maillot' ? _selectedSize : 'N/A',
         'quantity': _selectedProduct == 'Maillot' ? 1 : _quantity,
         'product': productName,
@@ -80,7 +64,8 @@ class _OrderScreenState extends State<OrderScreen> {
 
       if (mounted) {
         _showSuccessDialog();
-        _memberIdController.clear();
+        _firstNameController.clear();
+        _lastNameController.clear();
         setState(() {
           _selectedSize = null;
           _quantity = 1;
@@ -238,17 +223,55 @@ class _OrderScreenState extends State<OrderScreen> {
                 ),
                 const SizedBox(height: 24),
                 
-                TextField(
-                  controller: _memberIdController,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _firstNameController,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        decoration: InputDecoration(
+                          labelText: "Prénom",
+                          prefixIcon: const Icon(Icons.person_outline),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextField(
+                        controller: _lastNameController,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        decoration: InputDecoration(
+                          labelText: "Nom",
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                
+                const SizedBox(height: 20),
+
+                DropdownButtonFormField<String>(
+                  value: _selectedZone,
                   decoration: InputDecoration(
-                    labelText: "Identifiant Membre",
-                    hintText: "Saisir ici : AC010",
-                    prefixIcon: const Icon(Icons.badge_outlined),
+                    labelText: "Zone / Tribune",
+                    prefixIcon: const Icon(Icons.stadium_outlined),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
                     filled: true,
                     fillColor: Colors.white,
                   ),
+                  items: List.generate(14, (index) => (index + 1).toString())
+                      .map((zone) => DropdownMenuItem(
+                            value: zone,
+                            child: Text("Zone $zone"),
+                          ))
+                      .toList(),
+                  onChanged: (val) => setState(() => _selectedZone = val),
                 ),
                 
                 const SizedBox(height: 24),
