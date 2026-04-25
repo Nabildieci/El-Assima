@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,13 +11,20 @@
   <title>ELASSIMA</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="assets/images/logo_2.jpg">
   <link rel="icon" type="image/jpeg" href="assets/images/logo_2.jpg">
   <style>
     /* ===== RESET & ROOT ===== */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     :root {
       --red: #D32F2F;
@@ -26,9 +34,9 @@
       --dark: #121212;
       --card: #1a1a1a;
       --card2: #222222;
-      --border: rgba(255,255,255,0.08);
+      --border: rgba(255, 255, 255, 0.08);
       --text: #ffffff;
-      --text-muted: rgba(255,255,255,0.55);
+      --text-muted: rgba(255, 255, 255, 0.55);
       --success: #4CAF50;
       --warning: #FF9800;
       --gold: #FFD700;
@@ -44,35 +52,45 @@
 
     /* ===== SPLASH SCREEN ===== */
     #splash {
-      position: fixed; inset: 0;
+      position: fixed;
+      inset: 0;
       background: linear-gradient(180deg, #000000 0%, #1a0000 100%);
-      display: flex; flex-direction: column;
-      justify-content: center; align-items: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
       z-index: 9999;
       animation: splashFade 0.5s ease-out 2.5s forwards;
     }
 
     .splash-logo {
-      width: 130px; height: 130px;
+      width: 130px;
+      height: 130px;
       border-radius: 50%;
       background: white;
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       margin-bottom: 2rem;
-      box-shadow: 0 0 40px var(--red-glow), 0 0 80px rgba(211,47,47,0.2);
+      box-shadow: 0 0 40px var(--red-glow), 0 0 80px rgba(211, 47, 47, 0.2);
       animation: logoPulse 1.5s ease-in-out infinite;
       position: relative;
     }
 
     .splash-logo::before {
       content: '';
-      position: absolute; inset: -8px;
+      position: absolute;
+      inset: -8px;
       border-radius: 50%;
       border: 2px solid var(--red);
       opacity: 0.6;
       animation: ringPulse 1.5s ease-in-out infinite;
     }
 
-    .splash-logo svg { width: 80px; height: 80px; }
+    .splash-logo svg {
+      width: 80px;
+      height: 80px;
+    }
 
     .splash-title {
       font-size: 2rem;
@@ -95,14 +113,17 @@
     }
 
     .splash-bar {
-      width: 220px; height: 3px;
-      background: rgba(255,255,255,0.08);
-      border-radius: 10px; overflow: hidden;
+      width: 220px;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      overflow: hidden;
       margin-bottom: 1.5rem;
     }
 
     .splash-fill {
-      width: 0%; height: 100%;
+      width: 0%;
+      height: 100%;
       background: linear-gradient(90deg, var(--red), #ff6b6b);
       box-shadow: 0 0 12px var(--red);
       border-radius: 10px;
@@ -110,46 +131,123 @@
     }
 
     .splash-spinner {
-      width: 30px; height: 30px;
-      border: 2px solid rgba(255,255,255,0.1);
+      width: 30px;
+      height: 30px;
+      border: 2px solid rgba(255, 255, 255, 0.1);
       border-top: 2px solid var(--red);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
     }
 
-    @keyframes splashFade { to { opacity: 0; pointer-events: none; visibility: hidden; } }
-    @keyframes logoPulse {
-      0%,100% { transform: scale(1); box-shadow: 0 0 40px var(--red-glow); }
-      50% { transform: scale(1.05); box-shadow: 0 0 60px var(--red-glow), 0 0 100px rgba(211,47,47,0.15); }
+    @keyframes splashFade {
+      to {
+        opacity: 0;
+        pointer-events: none;
+        visibility: hidden;
+      }
     }
-    @keyframes ringPulse { 0%,100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.15); opacity: 0.2; } }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+
+    @keyframes logoPulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 40px var(--red-glow);
+      }
+
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 60px var(--red-glow), 0 0 100px rgba(211, 47, 47, 0.15);
+      }
+    }
+
+    @keyframes ringPulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 0.6;
+      }
+
+      50% {
+        transform: scale(1.15);
+        opacity: 0.2;
+      }
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: -200% 0;
+      }
+
+      100% {
+        background-position: 200% 0;
+      }
+    }
 
     /* ===== LOGIN SCREEN ===== */
     #login-screen {
-      position: fixed; inset: 0;
+      position: fixed;
+      inset: 0;
       background: linear-gradient(180deg, #000000 0%, #3d0000 50%, #000000 100%);
-      display: flex; flex-direction: column;
-      justify-content: center; align-items: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
       z-index: 1000;
       padding: 2rem;
     }
 
-    #login-screen.hidden { display: none; }
+    #login-screen.hidden {
+      display: none;
+    }
 
     .login-logo {
-      width: 120px; height: 120px;
+      width: 120px;
+      height: 120px;
       border-radius: 50%;
       background: white;
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       margin-bottom: 2rem;
       box-shadow: 0 0 50px var(--red-glow);
     }
 
-    .login-logo svg { width: 70px; height: 70px; }
+    .login-logo svg {
+      width: 70px;
+      height: 70px;
+    }
 
     .login-title {
       font-size: 1.5rem;
@@ -166,8 +264,8 @@
     }
 
     .pin-input-wrapper {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 16px;
       padding: 1.5rem 2rem;
       margin-bottom: 1rem;
@@ -175,12 +273,18 @@
       text-align: center;
     }
 
-    .pin-label { color: var(--text-muted); font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 1rem; }
+    .pin-label {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
 
     #pin-input {
       background: transparent;
       border: none;
-      border-bottom: 2px solid rgba(255,255,255,0.3);
+      border-bottom: 2px solid rgba(255, 255, 255, 0.3);
       color: white;
       font-size: 2.5rem;
       font-weight: 700;
@@ -192,7 +296,9 @@
       font-family: 'Inter', sans-serif;
     }
 
-    #pin-input:focus { border-bottom-color: white; }
+    #pin-input:focus {
+      border-bottom-color: white;
+    }
 
     .pin-error {
       color: #FFD700;
@@ -216,35 +322,61 @@
       margin-top: 1rem;
     }
 
-    .btn-login:hover { background: #eee; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255,255,255,0.2); }
-    .btn-login:active { transform: translateY(0); }
+    .btn-login:hover {
+      background: #eee;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-login:active {
+      transform: translateY(0);
+    }
 
     /* ===== MAIN APP ===== */
-    #app { display: none; flex-direction: column; min-height: 100vh; }
-    #app.visible { display: flex; }
+    #app {
+      display: none;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    #app.visible {
+      display: flex;
+    }
 
     /* TOP BAR */
     .topbar {
       background: #000;
       padding: 0.9rem 1.2rem;
-      display: flex; align-items: center; justify-content: space-between;
-      position: sticky; top: 0; z-index: 100;
-      border-bottom: 1px solid rgba(211,47,47,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid rgba(211, 47, 47, 0.3);
     }
 
     .topbar-brand {
-      display: flex; align-items: center; gap: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
     }
 
     .topbar-logo {
-      width: 40px; height: 40px;
+      width: 40px;
+      height: 40px;
       border-radius: 10px;
       background: white;
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       flex-shrink: 0;
     }
 
-    .topbar-logo svg { width: 28px; height: 28px; }
+    .topbar-logo svg {
+      width: 28px;
+      height: 28px;
+    }
 
     .topbar-name {
       font-size: 1.1rem;
@@ -256,8 +388,8 @@
 
     .btn-logout {
       background: transparent;
-      border: 1px solid rgba(255,255,255,0.2);
-      color: rgba(255,255,255,0.7);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: rgba(255, 255, 255, 0.7);
       border-radius: 8px;
       padding: 0.4rem 0.8rem;
       font-size: 0.75rem;
@@ -265,7 +397,10 @@
       transition: all 0.2s;
     }
 
-    .btn-logout:hover { border-color: var(--red); color: var(--red); }
+    .btn-logout:hover {
+      border-color: var(--red);
+      color: var(--red);
+    }
 
     /* PAGE CONTENT */
     .page-content {
@@ -276,31 +411,41 @@
 
     .page-content::before {
       content: '';
-      position: absolute; inset: 0;
-      background: repeating-linear-gradient(
-        -45deg,
-        transparent, transparent 60px,
-        rgba(211,47,47,0.015) 60px, rgba(211,47,47,0.015) 62px
-      );
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(-45deg,
+          transparent, transparent 60px,
+          rgba(211, 47, 47, 0.015) 60px, rgba(211, 47, 47, 0.015) 62px);
       pointer-events: none;
     }
 
-    .page { display: none; padding: 1.5rem; min-height: calc(100vh - 130px); }
-    .page.active { display: block; animation: fadeIn 0.3s ease; }
+    .page {
+      display: none;
+      padding: 1.5rem;
+      min-height: calc(100vh - 130px);
+    }
+
+    .page.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
 
     /* BOTTOM NAV */
     .bottom-nav {
       background: #111;
       border-top: 1px solid var(--border);
       display: flex;
-      position: sticky; bottom: 0;
+      position: sticky;
+      bottom: 0;
       backdrop-filter: blur(10px);
     }
 
     .nav-item {
       flex: 1;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       padding: 0.7rem 0.3rem 0.8rem;
       cursor: pointer;
       transition: all 0.2s;
@@ -313,9 +458,21 @@
       background: transparent;
     }
 
-    .nav-item.active { color: var(--red); }
-    .nav-item.active .nav-icon { color: var(--red); background: rgba(211,47,47,0.12); border-radius: 12px; }
-    .nav-icon { font-size: 1.5rem; padding: 0.3rem 0.8rem; transition: all 0.2s; }
+    .nav-item.active {
+      color: var(--red);
+    }
+
+    .nav-item.active .nav-icon {
+      color: var(--red);
+      background: rgba(211, 47, 47, 0.12);
+      border-radius: 12px;
+    }
+
+    .nav-icon {
+      font-size: 1.5rem;
+      padding: 0.3rem 0.8rem;
+      transition: all 0.2s;
+    }
 
     /* ===== PAGE: SCANNER ===== */
     .scanner-header {
@@ -325,7 +482,8 @@
     }
 
     .scanner-header h1 {
-      font-size: 1.4rem; font-weight: 800;
+      font-size: 1.4rem;
+      font-weight: 800;
       letter-spacing: 2px;
       background: linear-gradient(135deg, white, var(--red));
       -webkit-background-clip: text;
@@ -333,7 +491,11 @@
       background-clip: text;
     }
 
-    .scanner-header p { color: var(--text-muted); font-size: 0.8rem; margin-top: 0.4rem; }
+    .scanner-header p {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      margin-top: 0.4rem;
+    }
 
     .scanner-box {
       background: var(--card);
@@ -354,40 +516,72 @@
       margin: 0 auto 1.5rem;
       position: relative;
       overflow: hidden;
-      border: 2px solid rgba(211,47,47,0.4);
+      border: 2px solid rgba(211, 47, 47, 0.4);
     }
 
-    .camera-view video { width: 100%; height: 100%; object-fit: cover; border-radius: 14px; }
+    .camera-view video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 14px;
+    }
 
     .scan-overlay {
-      position: absolute; inset: 0;
-      display: flex; align-items: center; justify-content: center;
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       pointer-events: none;
     }
 
     .scan-frame {
-      width: 160px; height: 160px;
+      width: 160px;
+      height: 160px;
       border: none;
       position: relative;
     }
 
-    .scan-frame::before, .scan-frame::after,
-    .scan-frame span::before, .scan-frame span::after {
+    .scan-frame::before,
+    .scan-frame::after,
+    .scan-frame span::before,
+    .scan-frame span::after {
       content: '';
       position: absolute;
-      width: 24px; height: 24px;
+      width: 24px;
+      height: 24px;
       border-color: var(--red);
       border-style: solid;
     }
 
-    .scan-frame::before { top: 0; left: 0; border-width: 3px 0 0 3px; }
-    .scan-frame::after { top: 0; right: 0; border-width: 3px 3px 0 0; }
-    .scan-frame span::before { bottom: 0; left: 0; border-width: 0 0 3px 3px; }
-    .scan-frame span::after { bottom: 0; right: 0; border-width: 0 3px 3px 0; }
+    .scan-frame::before {
+      top: 0;
+      left: 0;
+      border-width: 3px 0 0 3px;
+    }
+
+    .scan-frame::after {
+      top: 0;
+      right: 0;
+      border-width: 3px 3px 0 0;
+    }
+
+    .scan-frame span::before {
+      bottom: 0;
+      left: 0;
+      border-width: 0 0 3px 3px;
+    }
+
+    .scan-frame span::after {
+      bottom: 0;
+      right: 0;
+      border-width: 0 3px 3px 0;
+    }
 
     .scan-line {
       position: absolute;
-      left: 10px; right: 10px;
+      left: 10px;
+      right: 10px;
       height: 2px;
       background: linear-gradient(90deg, transparent, var(--red), transparent);
       box-shadow: 0 0 8px var(--red);
@@ -395,21 +589,35 @@
     }
 
     @keyframes scanLine {
-      0%, 100% { top: 10px; }
-      50% { top: calc(100% - 10px); }
+
+      0%,
+      100% {
+        top: 10px;
+      }
+
+      50% {
+        top: calc(100% - 10px);
+      }
     }
 
     .camera-placeholder {
       width: 100%;
       height: 100%;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       color: var(--text-muted);
       gap: 0.5rem;
     }
 
-    .camera-placeholder .icon { font-size: 3rem; }
-    .camera-placeholder p { font-size: 0.75rem; }
+    .camera-placeholder .icon {
+      font-size: 3rem;
+    }
+
+    .camera-placeholder p {
+      font-size: 0.75rem;
+    }
 
     .btn-scan {
       width: 100%;
@@ -424,10 +632,13 @@
       letter-spacing: 2px;
       cursor: pointer;
       transition: all 0.2s;
-      box-shadow: 0 4px 20px rgba(211,47,47,0.4);
+      box-shadow: 0 4px 20px rgba(211, 47, 47, 0.4);
     }
 
-    .btn-scan:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(211,47,47,0.5); }
+    .btn-scan:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(211, 47, 47, 0.5);
+    }
 
     .search-section {
       background: var(--card);
@@ -438,15 +649,22 @@
       animation: slideUp 0.4s ease 0.2s both;
     }
 
-    .search-section h3 { font-size: 0.8rem; letter-spacing: 2px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 1rem; }
+    .search-section h3 {
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
 
     .search-row {
-      display: flex; gap: 0.7rem;
+      display: flex;
+      gap: 0.7rem;
     }
 
     .search-input {
       flex: 1;
-      background: rgba(255,255,255,0.05);
+      background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 0.8rem 1rem;
@@ -457,8 +675,13 @@
       transition: border-color 0.2s;
     }
 
-    .search-input:focus { border-color: var(--red); }
-    .search-input::placeholder { color: var(--text-muted); }
+    .search-input:focus {
+      border-color: var(--red);
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+    }
 
     .btn-search {
       background: var(--red);
@@ -471,7 +694,9 @@
       transition: all 0.2s;
     }
 
-    .btn-search:hover { background: var(--red-dark); }
+    .btn-search:hover {
+      background: var(--red-dark);
+    }
 
     .scan-result {
       background: var(--card2);
@@ -483,12 +708,22 @@
       animation: fadeIn 0.3s ease;
     }
 
-    .scan-result.visible { display: block; }
-    .scan-result.success { border-color: var(--success); }
-    .scan-result.error { border-color: var(--red); }
+    .scan-result.visible {
+      display: block;
+    }
+
+    .scan-result.success {
+      border-color: var(--success);
+    }
+
+    .scan-result.error {
+      border-color: var(--red);
+    }
 
     .result-badge {
-      display: inline-flex; align-items: center; gap: 0.4rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
       padding: 0.3rem 0.8rem;
       border-radius: 50px;
       font-size: 0.7rem;
@@ -497,18 +732,48 @@
       margin-bottom: 0.8rem;
     }
 
-    .result-badge.success { background: rgba(76,175,80,0.15); color: var(--success); border: 1px solid rgba(76,175,80,0.3); }
-    .result-badge.error { background: rgba(211,47,47,0.15); color: #ff6b6b; border: 1px solid rgba(211,47,47,0.3); }
+    .result-badge.success {
+      background: rgba(76, 175, 80, 0.15);
+      color: var(--success);
+      border: 1px solid rgba(76, 175, 80, 0.3);
+    }
 
-    .result-name { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.3rem; }
-    .result-id { color: var(--red); font-size: 0.8rem; font-weight: 600; letter-spacing: 2px; }
-    .result-zone { color: var(--text-muted); font-size: 0.75rem; margin-top: 0.3rem; }
-    .result-msg { color: var(--text-muted); font-size: 0.85rem; }
+    .result-badge.error {
+      background: rgba(211, 47, 47, 0.15);
+      color: #ff6b6b;
+      border: 1px solid rgba(211, 47, 47, 0.3);
+    }
+
+    .result-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+    }
+
+    .result-id {
+      color: var(--red);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+    }
+
+    .result-zone {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-top: 0.3rem;
+    }
+
+    .result-msg {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
 
     /* ===== PAGE: MEMBRES / ZONES ===== */
     .zones-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 1rem; margin-bottom: 1.5rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
       animation: slideUp 0.4s ease;
     }
 
@@ -522,43 +787,94 @@
       transition: all 0.2s;
     }
 
-    .zone-card:hover { border-color: var(--red); transform: translateY(-3px); box-shadow: 0 8px 25px rgba(211,47,47,0.2); }
-    .zone-card.active { border-color: var(--red); background: rgba(211,47,47,0.08); }
+    .zone-card:hover {
+      border-color: var(--red);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(211, 47, 47, 0.2);
+    }
+
+    .zone-card.active {
+      border-color: var(--red);
+      background: rgba(211, 47, 47, 0.08);
+    }
 
     .zone-num {
-      font-size: 2rem; font-weight: 900; color: var(--red);
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--red);
       line-height: 1;
     }
 
-    .zone-label { font-size: 0.65rem; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; margin-top: 0.3rem; }
-    .zone-count { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; }
+    .zone-label {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 0.3rem;
+    }
 
-    .members-list { display: flex; flex-direction: column; gap: 0.8rem; animation: slideUp 0.3s ease; }
+    .zone-count {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+
+    .members-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      animation: slideUp 0.3s ease;
+    }
 
     .member-card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 16px;
       padding: 1rem 1.2rem;
-      display: flex; align-items: center; gap: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
       transition: all 0.2s;
     }
 
-    .member-card:hover { border-color: rgba(211,47,47,0.4); }
+    .member-card:hover {
+      border-color: rgba(211, 47, 47, 0.4);
+    }
 
     .member-avatar {
-      width: 44px; height: 44px;
+      width: 44px;
+      height: 44px;
       border-radius: 12px;
       background: linear-gradient(135deg, var(--red), var(--red-dark));
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 1rem; color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1rem;
+      color: white;
       flex-shrink: 0;
     }
 
-    .member-info { flex: 1; }
-    .member-name { font-weight: 700; font-size: 0.95rem; }
-    .member-id { color: var(--red); font-size: 0.75rem; letter-spacing: 1px; margin-top: 0.2rem; }
-    .member-zone { color: var(--text-muted); font-size: 0.7rem; }
+    .member-info {
+      flex: 1;
+    }
+
+    .member-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .member-id {
+      color: var(--red);
+      font-size: 0.75rem;
+      letter-spacing: 1px;
+      margin-top: 0.2rem;
+    }
+
+    .member-zone {
+      color: var(--text-muted);
+      font-size: 0.7rem;
+    }
 
     .member-badge {
       padding: 0.25rem 0.6rem;
@@ -567,8 +883,17 @@
       font-weight: 700;
     }
 
-    .badge-present { background: rgba(76,175,80,0.15); color: var(--success); border: 1px solid rgba(76,175,80,0.3); }
-    .badge-absent { background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid var(--border); }
+    .badge-present {
+      background: rgba(76, 175, 80, 0.15);
+      color: var(--success);
+      border: 1px solid rgba(76, 175, 80, 0.3);
+    }
+
+    .badge-absent {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
 
     /* ===== PAGE: BOUTIQUE ===== */
     .boutique-section {
@@ -577,11 +902,15 @@
     }
 
     .section-title {
-      font-size: 0.75rem; font-weight: 700;
-      letter-spacing: 3px; text-transform: uppercase;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
       color: var(--text-muted);
       margin-bottom: 1rem;
-      display: flex; align-items: center; gap: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
     }
 
     .section-title::after {
@@ -606,13 +935,19 @@
       cursor: pointer;
     }
 
-    .product-card:hover { transform: translateY(-4px); border-color: rgba(211,47,47,0.5); box-shadow: 0 10px 30px rgba(211,47,47,0.15); }
+    .product-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(211, 47, 47, 0.5);
+      box-shadow: 0 10px 30px rgba(211, 47, 47, 0.15);
+    }
 
     .product-img {
       width: 100%;
       aspect-ratio: 1;
       background: linear-gradient(135deg, #1d1d1d, #2a2a2a);
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 3.5rem;
       position: relative;
       overflow: hidden;
@@ -620,34 +955,61 @@
 
     .product-img::after {
       content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.7));
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.7));
     }
 
     .product-badge-new {
-      position: absolute; top: 8px; right: 8px;
+      position: absolute;
+      top: 8px;
+      right: 8px;
       background: var(--red);
       color: white;
-      font-size: 0.55rem; font-weight: 700;
+      font-size: 0.55rem;
+      font-weight: 700;
       letter-spacing: 1px;
       padding: 0.2rem 0.5rem;
       border-radius: 6px;
       z-index: 1;
     }
 
-    .product-info { padding: 0.9rem; }
-    .product-name { font-weight: 700; font-size: 0.85rem; margin-bottom: 0.3rem; }
-    .product-desc { color: var(--text-muted); font-size: 0.7rem; line-height: 1.4; margin-bottom: 0.6rem; }
-    .product-price { color: var(--red); font-weight: 800; font-size: 1rem; }
-    .product-price span { font-size: 0.7rem; color: var(--text-muted); font-weight: 400; }
+    .product-info {
+      padding: 0.9rem;
+    }
+
+    .product-name {
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .product-desc {
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      line-height: 1.4;
+      margin-bottom: 0.6rem;
+    }
+
+    .product-price {
+      color: var(--red);
+      font-weight: 800;
+      font-size: 1rem;
+    }
+
+    .product-price span {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
 
     .btn-add {
       width: 100%;
       margin-top: 0.7rem;
       padding: 0.6rem;
-      background: rgba(211,47,47,0.1);
+      background: rgba(211, 47, 47, 0.1);
       color: var(--red);
-      border: 1px solid rgba(211,47,47,0.3);
+      border: 1px solid rgba(211, 47, 47, 0.3);
       border-radius: 10px;
       font-size: 0.75rem;
       font-weight: 700;
@@ -656,7 +1018,10 @@
       transition: all 0.2s;
     }
 
-    .btn-add:hover { background: var(--red); color: white; }
+    .btn-add:hover {
+      background: var(--red);
+      color: white;
+    }
 
     /* ===== CART INDICATOR ===== */
     .cart-indicator {
@@ -665,14 +1030,31 @@
       border-radius: 16px;
       padding: 1rem 1.2rem;
       margin-bottom: 1.5rem;
-      display: flex; align-items: center; justify-content: space-between;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       animation: slideUp 0.3s ease;
     }
 
-    .cart-info { display: flex; align-items: center; gap: 0.8rem; }
-    .cart-icon { font-size: 1.5rem; }
-    .cart-count { font-weight: 700; }
-    .cart-total { color: var(--red); font-weight: 800; font-size: 1.1rem; }
+    .cart-info {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .cart-icon {
+      font-size: 1.5rem;
+    }
+
+    .cart-count {
+      font-weight: 700;
+    }
+
+    .cart-total {
+      color: var(--red);
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
 
     .btn-checkout {
       background: linear-gradient(135deg, var(--red), var(--red-dark));
@@ -686,11 +1068,16 @@
       transition: all 0.2s;
     }
 
-    .btn-checkout:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(211,47,47,0.4); }
+    .btn-checkout:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(211, 47, 47, 0.4);
+    }
 
     /* ===== PAGE: COMMANDES ===== */
     .stats-grid {
-      display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
       margin-bottom: 1.5rem;
       animation: slideUp 0.3s ease;
     }
@@ -703,10 +1090,26 @@
       text-align: center;
     }
 
-    .stat-value { font-size: 2rem; font-weight: 900; color: var(--red); line-height: 1; }
-    .stat-label { font-size: 0.65rem; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; margin-top: 0.4rem; }
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--red);
+      line-height: 1;
+    }
 
-    .orders-list { display: flex; flex-direction: column; gap: 0.8rem; }
+    .stat-label {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 0.4rem;
+    }
+
+    .orders-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
 
     .order-card {
       background: var(--card);
@@ -717,43 +1120,88 @@
     }
 
     .order-header {
-      display: flex; align-items: center; justify-content: space-between;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       margin-bottom: 0.6rem;
     }
 
-    .order-name { font-weight: 700; font-size: 0.9rem; }
-    .order-total { color: var(--red); font-weight: 800; }
-    .order-items { color: var(--text-muted); font-size: 0.75rem; }
+    .order-name {
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .order-total {
+      color: var(--red);
+      font-weight: 800;
+    }
+
+    .order-items {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+    }
 
     /* ===== PAGE: HISTORIQUE ===== */
-    .history-list { display: flex; flex-direction: column; gap: 0.8rem; }
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
 
     .history-card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 14px;
       padding: 0.9rem 1.1rem;
-      display: flex; align-items: center; gap: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
       animation: fadeIn 0.3s ease;
     }
 
     .history-dot {
-      width: 10px; height: 10px;
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
       flex-shrink: 0;
     }
 
-    .history-dot.success { background: var(--success); box-shadow: 0 0 8px rgba(76,175,80,0.5); }
-    .history-dot.error { background: var(--red); box-shadow: 0 0 8px rgba(211,47,47,0.5); }
+    .history-dot.success {
+      background: var(--success);
+      box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+    }
 
-    .history-info { flex: 1; }
-    .history-event { font-size: 0.85rem; font-weight: 600; }
-    .history-time { color: var(--text-muted); font-size: 0.7rem; margin-top: 0.2rem; }
-    .history-zone { color: var(--text-muted); font-size: 0.7rem; }
+    .history-dot.error {
+      background: var(--red);
+      box-shadow: 0 0 8px rgba(211, 47, 47, 0.5);
+    }
+
+    .history-info {
+      flex: 1;
+    }
+
+    .history-event {
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .history-time {
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      margin-top: 0.2rem;
+    }
+
+    .history-zone {
+      color: var(--text-muted);
+      font-size: 0.7rem;
+    }
 
     /* ===== TOAST ===== */
     #toast {
-      position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
       background: var(--card2);
       border: 1px solid var(--border);
       color: white;
@@ -766,40 +1214,68 @@
       pointer-events: none;
       z-index: 500;
       white-space: nowrap;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
     }
 
-    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-    #toast.success { border-color: var(--success); color: var(--success); }
-    #toast.error { border-color: var(--red); color: #ff6b6b; }
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    #toast.success {
+      border-color: var(--success);
+      color: var(--success);
+    }
+
+    #toast.error {
+      border-color: var(--red);
+      color: #ff6b6b;
+    }
 
     /* ===== MODAL ===== */
     .modal-overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.8);
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
       backdrop-filter: blur(4px);
       z-index: 300;
-      display: none; align-items: center; justify-content: center;
+      display: none;
+      align-items: center;
+      justify-content: center;
       padding: 1rem;
     }
 
-    .modal-overlay.visible { display: flex; }
+    .modal-overlay.visible {
+      display: flex;
+    }
 
     .modal {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 24px;
       padding: 2rem;
-      width: 100%; max-width: 380px;
+      width: 100%;
+      max-width: 380px;
       animation: slideUp 0.3s ease;
     }
 
-    .modal-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 0.5rem; }
-    .modal-sub { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem; }
+    .modal-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-sub {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-bottom: 1.5rem;
+    }
 
     .size-grid {
-      display: grid; grid-template-columns: repeat(4, 1fr);
-      gap: 0.5rem; margin-bottom: 1.5rem;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
     }
 
     .size-btn {
@@ -808,38 +1284,138 @@
       border: 1px solid var(--border);
       background: transparent;
       color: white;
-      font-weight: 700; font-size: 0.8rem;
+      font-weight: 700;
+      font-size: 0.8rem;
       cursor: pointer;
       transition: all 0.2s;
     }
 
-    .size-btn.active { background: var(--red); border-color: var(--red); }
-    .size-btn:hover { border-color: var(--red); }
+    .size-btn.active {
+      background: var(--red);
+      border-color: var(--red);
+    }
 
-    .modal-actions { display: flex; gap: 0.8rem; }
+    .size-btn:hover {
+      border-color: var(--red);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 0.8rem;
+    }
 
     .btn-cancel {
-      flex: 1; padding: 0.8rem;
-      background: rgba(255,255,255,0.05);
+      flex: 1;
+      padding: 0.8rem;
+      background: rgba(255, 255, 255, 0.05);
       color: var(--text-muted);
       border: 1px solid var(--border);
       border-radius: 12px;
-      font-size: 0.85rem; font-weight: 700;
+      font-size: 0.85rem;
+      font-weight: 700;
       cursor: pointer;
     }
 
     .btn-confirm {
-      flex: 2; padding: 0.8rem;
+      flex: 2;
+      padding: 0.8rem;
       background: var(--red);
       color: white;
       border: none;
       border-radius: 12px;
-      font-size: 0.85rem; font-weight: 700;
+      font-size: 0.85rem;
+      font-weight: 700;
       cursor: pointer;
       transition: all 0.2s;
     }
 
-    .btn-confirm:hover { background: var(--red-dark); }
+    .btn-confirm:hover {
+      background: var(--red-dark);
+    }
+
+    /* FORM INPUTS IN MODAL */
+    .modal-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      text-align: left;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .form-group label {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .form-input {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.8rem;
+      color: white;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus {
+      border-color: var(--red);
+    }
+
+    .form-select {
+      background: #1a1a1a;
+      color: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.8rem;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    /* PLANNING SUMMARY */
+    .stats-summary {
+      background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);
+      border: 1px solid rgba(211, 47, 47, 0.3);
+      border-radius: 16px;
+      padding: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .summary-item {
+      text-align: center;
+    }
+
+    .summary-label {
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      letter-spacing: 2px;
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    .summary-value {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--red);
+    }
+
+    .summary-divider {
+      width: 1px;
+      height: 30px;
+      background: rgba(255, 255, 255, 0.1);
+    }
 
     /* ===== PAGE HEADER ===== */
     .page-header {
@@ -847,454 +1423,534 @@
     }
 
     .page-header h2 {
-      font-size: 1.4rem; font-weight: 800;
+      font-size: 1.4rem;
+      font-weight: 800;
       background: linear-gradient(135deg, white 0%, var(--red) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
 
-    .page-header p { color: var(--text-muted); font-size: 0.8rem; margin-top: 0.3rem; }
+    .page-header p {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      margin-top: 0.3rem;
+    }
 
     /* Responsive */
     @media (min-width: 600px) {
-      .page { max-width: 600px; margin: 0 auto; }
-      .zones-grid { grid-template-columns: repeat(5, 1fr); }
+      .page {
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .zones-grid {
+        grid-template-columns: repeat(5, 1fr);
+      }
     }
   </style>
 </head>
+
 <body>
 
-<!-- ===== SPLASH SCREEN ===== -->
-<div id="splash">
-  <div class="splash-logo">
-    <svg viewBox="0 0 100 100" fill="none">
-      <circle cx="50" cy="50" r="44" fill="#D32F2F"/>
-      <text x="50" y="62" text-anchor="middle" font-family="Arial" font-weight="900" font-size="36" fill="white">EA</text>
-    </svg>
-  </div>
-  <div class="splash-title">EL ASSIMA</div>
-  <div class="splash-sub">Système de gestion</div>
-  <div class="splash-bar"><div class="splash-fill" id="splash-fill"></div></div>
-  <div class="splash-spinner"></div>
-</div>
-
-<!-- ===== LOGIN SCREEN ===== -->
-<div id="login-screen" class="hidden">
-  <div class="login-logo">
-    <svg viewBox="0 0 100 100" fill="none">
-      <circle cx="50" cy="50" r="44" fill="#D32F2F"/>
-      <text x="50" y="62" text-anchor="middle" font-family="Arial" font-weight="900" font-size="36" fill="white">EA</text>
-    </svg>
-  </div>
-  <div class="login-title">ACCÈS SÉCURISÉ</div>
-  <div class="login-sub">Entrez le code d'accès EL ASSIMA</div>
-
-  <div class="pin-input-wrapper">
-    <div class="pin-label">Code PIN</div>
-    <input type="password" id="pin-input" maxlength="4" inputmode="numeric" placeholder="••••" autocomplete="off">
-  </div>
-
-  <div class="pin-error" id="pin-error"></div>
-  <button class="btn-login" id="btn-login-confirm" onclick="checkPin()">ENTRER</button>
-</div>
-
-<!-- ===== MAIN APP ===== -->
-<div id="app">
-  <!-- TOP BAR -->
-  <header class="topbar">
-    <div class="topbar-brand">
-      <div class="topbar-logo">
-        <svg viewBox="0 0 100 100" fill="none">
-          <circle cx="50" cy="50" r="44" fill="#D32F2F"/>
-          <text x="50" y="62" text-anchor="middle" font-family="Arial" font-weight="900" font-size="36" fill="white">EA</text>
-        </svg>
-      </div>
-      <div class="topbar-name">EL ASSIMA</div>
+  <!-- ===== SPLASH SCREEN ===== -->
+  <div id="splash">
+    <div class="splash-logo">
+      <svg viewBox="0 0 100 100" fill="none">
+        <circle cx="50" cy="50" r="44" fill="#D32F2F" />
+        <text x="50" y="62" text-anchor="middle" font-family="Arial" font-weight="900" font-size="36"
+          fill="white">EA</text>
+      </svg>
     </div>
-    <button class="btn-logout" onclick="logout()">⏻ Déconnexion</button>
-  </header>
+    <div class="splash-title">EL ASSIMA</div>
+    <div class="splash-sub">Système de gestion</div>
+    <div class="splash-bar">
+      <div class="splash-fill" id="splash-fill"></div>
+    </div>
+    <div class="splash-spinner"></div>
+  </div>
 
-  <!-- PAGE CONTENT -->
-  <main class="page-content">
+  <!-- ===== LOGIN SCREEN ===== -->
+  <div id="login-screen" class="hidden">
+    <div class="login-logo">
+      <svg viewBox="0 0 100 100" fill="none">
+        <circle cx="50" cy="50" r="44" fill="#D32F2F" />
+        <text x="50" y="62" text-anchor="middle" font-family="Arial" font-weight="900" font-size="36"
+          fill="white">EA</text>
+      </svg>
+    </div>
+    <div class="login-title">ACCÈS SÉCURISÉ</div>
+    <div class="login-sub">Entrez le code d'accès EL ASSIMA</div>
 
-    <!-- SCANNER PAGE -->
-    <section class="page active" id="page-scanner">
-      <div class="scanner-header">
-        <h1>📷 SCANNER</h1>
-        <p>Scannez ou recherchez un membre par ID</p>
+    <div class="pin-input-wrapper">
+      <div class="pin-label">Code PIN</div>
+      <input type="password" id="pin-input" maxlength="4" inputmode="numeric" placeholder="••••" autocomplete="off">
+    </div>
+
+    <div class="pin-error" id="pin-error"></div>
+    <button class="btn-login" id="btn-login-confirm" onclick="checkPin()">ENTRER</button>
+  </div>
+
+  <!-- ===== MAIN APP ===== -->
+  <div id="app">
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <div class="topbar-brand">
+        <div class="topbar-logo">
+          <svg viewBox="0 0 100 100" fill="none">
+            <circle cx="50" cy="50" r="44" fill="#D32F2F" />
+            <text x="50" y="62" text-anchor="middle" font-family="Arial" font-weight="900" font-size="36"
+              fill="white">EA</text>
+          </svg>
+        </div>
+        <div class="topbar-name">EL ASSIMA</div>
       </div>
+      <button class="btn-logout" onclick="logout()">⏻ Déconnexion</button>
+    </header>
 
-      <div class="scanner-box">
-        <div class="camera-view" id="camera-view">
-          <video id="camera-feed" autoplay playsinline></video>
-          <div class="scan-overlay">
-            <div class="scan-frame"><span></span></div>
-            <div class="scan-line"></div>
+    <!-- PAGE CONTENT -->
+    <main class="page-content">
+
+      <!-- SCANNER PAGE -->
+      <section class="page active" id="page-scanner">
+        <div class="scanner-header">
+          <h1>📷 SCANNER</h1>
+          <p>Scannez ou recherchez un membre par ID</p>
+        </div>
+
+        <div class="scanner-box">
+          <div class="camera-view" id="camera-view">
+            <video id="camera-feed" autoplay playsinline></video>
+            <div class="scan-overlay">
+              <div class="scan-frame"><span></span></div>
+              <div class="scan-line"></div>
+            </div>
+            <div class="camera-placeholder" id="camera-placeholder">
+              <div class="icon">📷</div>
+              <p>Caméra désactivée</p>
+            </div>
           </div>
-          <div class="camera-placeholder" id="camera-placeholder">
-            <div class="icon">📷</div>
-            <p>Caméra désactivée</p>
+          <button class="btn-scan" id="btn-toggle-cam" onclick="toggleCamera()">
+            🎥 ACTIVER CAMÉRA
+          </button>
+        </div>
+
+        <div class="search-section">
+          <h3>🔍 Recherche manuelle</h3>
+          <div class="search-row">
+            <input type="text" class="search-input" id="search-id" placeholder="Ex: AC001, Z14-002..."
+              onkeydown="if(event.key==='Enter') searchMember()">
+            <button class="btn-search" onclick="searchMember()">→</button>
           </div>
+          <div class="scan-result" id="scan-result"></div>
         </div>
-        <button class="btn-scan" id="btn-toggle-cam" onclick="toggleCamera()">
-          🎥 ACTIVER CAMÉRA
-        </button>
-      </div>
 
-      <div class="search-section">
-        <h3>🔍 Recherche manuelle</h3>
-        <div class="search-row">
-          <input type="text" class="search-input" id="search-id" placeholder="Ex: AC001, Z14-002..." 
-                 onkeydown="if(event.key==='Enter') searchMember()">
-          <button class="btn-search" onclick="searchMember()">→</button>
-        </div>
-        <div class="scan-result" id="scan-result"></div>
-      </div>
-
-      <!-- Stats rapides -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
-        <div class="stat-card">
-          <div class="stat-value" id="stat-present">0</div>
-          <div class="stat-label">Présents</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="stat-total">0</div>
-          <div class="stat-label">Total</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ZONES PAGE -->
-    <section class="page" id="page-zones">
-      <div class="page-header">
-        <h2>🏟️ ZONES & MEMBRES</h2>
-        <p>Sélectionnez une zone pour voir ses membres</p>
-      </div>
-
-      <div class="zones-grid" id="zones-grid"></div>
-      <div class="members-list" id="members-list"></div>
-    </section>
-
-    <!-- BOUTIQUE PAGE -->
-    <section class="page" id="page-boutique">
-      <div class="page-header">
-        <h2>🛍️ BOUTIQUE</h2>
-        <p>Maillots, porte-clés et produits officiels</p>
-      </div>
-
-      <div class="cart-indicator" id="cart-indicator" style="display:none">
-        <div class="cart-info">
-          <span class="cart-icon">🛒</span>
-          <div>
-            <div class="cart-count" id="cart-count">0 article(s)</div>
-            <div style="color:var(--text-muted);font-size:0.7rem">Panier en cours</div>
+        <!-- Stats rapides -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div class="stat-card">
+            <div class="stat-value" id="stat-present">0</div>
+            <div class="stat-label">Présents</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="stat-total">0</div>
+            <div class="stat-label">Total</div>
           </div>
         </div>
-        <div class="cart-total" id="cart-total-display">0 DA</div>
-        <button class="btn-checkout" onclick="showOrders()">Voir →</button>
+      </section>
+
+      <!-- ZONES PAGE -->
+      <section class="page" id="page-zones">
+        <div class="page-header">
+          <h2>🏟️ RÉSERVATIONS & PLANNING</h2>
+          <p>Sélectionnez une zone pour voir les membres</p>
+        </div>
+
+        <!-- Bandeau Statistiques Globales (Planning) -->
+        <div class="stats-summary" id="zones-summary">
+          <div class="summary-item">
+            <span class="summary-label">TOTAL RÉSERVATIONS</span>
+            <span class="summary-value" id="summary-total-res">0</span>
+          </div>
+          <div class="summary-divider"></div>
+          <div class="summary-item">
+            <span class="summary-label">PRÉSENTS</span>
+            <span class="summary-value" id="summary-present-res">0</span>
+          </div>
+        </div>
+
+        <div class="zones-grid" id="zones-grid"></div>
+        <div class="members-list" id="members-list"></div>
+      </section>
+
+      <!-- BOUTIQUE PAGE -->
+      <section class="page" id="page-boutique">
+        <div class="page-header">
+          <h2>🛍️ BOUTIQUE</h2>
+          <p>Maillots, porte-clés et produits officiels</p>
+        </div>
+
+        <div class="cart-indicator" id="cart-indicator" style="display:none">
+          <div class="cart-info">
+            <span class="cart-icon">🛒</span>
+            <div>
+              <div class="cart-count" id="cart-count">0 article(s)</div>
+              <div style="color:var(--text-muted);font-size:0.7rem">Panier en cours</div>
+            </div>
+          </div>
+          <div class="cart-total" id="cart-total-display">0 DA</div>
+          <button class="btn-checkout" onclick="showOrders()">Voir →</button>
+        </div>
+
+        <div class="boutique-section">
+          <div class="section-title">Maillots officiels</div>
+          <div class="products-grid" id="jerseys-grid"></div>
+        </div>
+
+        <div class="boutique-section">
+          <div class="section-title">Accessoires</div>
+          <div class="products-grid" id="access-grid"></div>
+        </div>
+      </section>
+
+      <!-- COMMANDES PAGE -->
+      <section class="page" id="page-commandes">
+        <div class="page-header">
+          <h2>📋 COMMANDES</h2>
+          <p>Historique et statistiques des commandes</p>
+        </div>
+
+        <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+          <div class="stat-card">
+            <div class="stat-value" id="cmd-jerseys" style="font-size:1.5rem">0</div>
+            <div class="stat-label">Maillots</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="cmd-keys" style="font-size:1.5rem">0</div>
+            <div class="stat-label">P. clés</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="cmd-pins" style="font-size:1.5rem">0</div>
+            <div class="stat-label">Pins</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="cmd-stickers" style="font-size:1.5rem">0</div>
+            <div class="stat-label">Stickers</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="cmd-beret" style="font-size:1.5rem">0</div>
+            <div class="stat-label">Bérets</div>
+          </div>
+          <div class="stat-card" style="grid-column: span 3">
+            <div class="stat-value" id="cmd-total">0 DA</div>
+            <div class="stat-label">Total des ventes</div>
+          </div>
+        </div>
+
+        <div class="section-title">Commandes récentes</div>
+        <div class="orders-list" id="orders-list">
+          <div style="text-align:center;color:var(--text-muted);padding:2rem;font-size:0.85rem;">
+            Aucune commande pour le moment
+          </div>
+        </div>
+      </section>
+
+      <!-- HISTORIQUE PAGE -->
+      <section class="page" id="page-history">
+        <div class="page-header">
+          <h2>📜 HISTORIQUE</h2>
+          <p>Journal des entrées et événements</p>
+        </div>
+
+        <div class="history-list" id="history-list">
+          <div style="text-align:center;color:var(--text-muted);padding:2rem;font-size:0.85rem;">
+            Aucun événement enregistré
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- BOTTOM NAV (ADMIN) -->
+    <nav class="bottom-nav" id="bottom-nav-admin" style="display:none">
+      <button class="nav-item active" onclick="switchPage('scanner', this)" id="nav-scanner">
+        <span class="nav-icon">📷</span>Scanner
+      </button>
+      <button class="nav-item" onclick="switchPage('zones', this)" id="nav-zones">
+        <span class="nav-icon">👥</span>ZONES
+      </button>
+      <button class="nav-item" onclick="switchPage('boutique', this)" id="nav-boutique">
+        <span class="nav-icon">🛍️</span>BOUTIQUE
+      </button>
+      <button class="nav-item" onclick="switchPage('commandes', this)" id="nav-commandes">
+        <span class="nav-icon">📋</span>COMMANDE
+      </button>
+      <button class="nav-item" onclick="switchPage('history', this)" id="nav-history">
+        <span class="nav-icon">📜</span>Historique
+      </button>
+    </nav>
+
+    <!-- BOTTOM NAV (USER) -->
+    <nav class="bottom-nav" id="bottom-nav-user" style="display:none">
+      <button class="nav-item active" onclick="switchPage('boutique', this)">
+        <span class="nav-icon">🛍️</span>BOUTIQUE
+      </button>
+    </nav>
+  </div>
+
+  <!-- ===== MODAL ===== -->
+  <div class="modal-overlay" id="modal-jersey">
+    <div class="modal">
+      <div class="modal-title" id="modal-product-name">Maillot EL ASSIMA</div>
+      <div class="modal-sub">Informations client & Taille</div>
+
+      <div class="modal-form">
+        <div style="display:flex; gap:1rem;">
+          <div class="form-group" style="flex:1">
+            <label>Prénom</label>
+            <input type="text" id="order-firstname" class="form-input" placeholder="Ex: Nabil">
+          </div>
+          <div class="form-group" style="flex:1">
+            <label>Nom</label>
+            <input type="text" id="order-lastname" class="form-input" placeholder="Ex: USMA">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Zone (Tribune)</label>
+          <select id="order-zone" class="form-select">
+            <option value="">-- Sélectionner --</option>
+            <option value="1">Zone 1</option>
+            <option value="2">Zone 2</option>
+            <option value="3">Zone 3</option>
+            <option value="4">Zone 4</option>
+            <option value="5">Zone 5</option>
+            <option value="6">Zone 6</option>
+            <option value="7">Zone 7</option>
+            <option value="8">Zone 8</option>
+            <option value="9">Zone 9</option>
+            <option value="10">Zone 10</option>
+            <option value="11">Zone 11</option>
+            <option value="12">Zone 12</option>
+            <option value="13">Zone 13</option>
+            <option value="14">Zone 14</option>
+          </select>
+        </div>
       </div>
 
-      <div class="boutique-section">
-        <div class="section-title">Maillots officiels</div>
-        <div class="products-grid" id="jerseys-grid"></div>
+      <div class="size-grid" id="modal-size-selector">
+        <button class="size-btn" onclick="selectSize('XS')" id="sz-XS">XS</button>
+        <button class="size-btn" onclick="selectSize('S')" id="sz-S">S</button>
+        <button class="size-btn" onclick="selectSize('M')" id="sz-M">M</button>
+        <button class="size-btn" onclick="selectSize('L')" id="sz-L">L</button>
+        <button class="size-btn" onclick="selectSize('XL')" id="sz-XL">XL</button>
+        <button class="size-btn" onclick="selectSize('XXL')" id="sz-XXL">XXL</button>
+        <button class="size-btn" onclick="selectSize('3XL')" id="sz-3XL">3XL</button>
+        <button class="size-btn" onclick="selectSize('4XL')" id="sz-4XL">4XL</button>
       </div>
-
-      <div class="boutique-section">
-        <div class="section-title">Accessoires</div>
-        <div class="products-grid" id="access-grid"></div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal()">Annuler</button>
+        <button class="btn-confirm" onclick="addToCart()">➕ Ajouter</button>
       </div>
-    </section>
-
-    <!-- COMMANDES PAGE -->
-    <section class="page" id="page-commandes">
-      <div class="page-header">
-        <h2>📋 COMMANDES</h2>
-        <p>Historique et statistiques des commandes</p>
-      </div>
-
-      <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
-        <div class="stat-card">
-          <div class="stat-value" id="cmd-jerseys" style="font-size:1.5rem">0</div>
-          <div class="stat-label">Maillots</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="cmd-keys" style="font-size:1.5rem">0</div>
-          <div class="stat-label">P. clés</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="cmd-pins" style="font-size:1.5rem">0</div>
-          <div class="stat-label">Pins</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="cmd-stickers" style="font-size:1.5rem">0</div>
-          <div class="stat-label">Stickers</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="cmd-beret" style="font-size:1.5rem">0</div>
-          <div class="stat-label">Bérets</div>
-        </div>
-        <div class="stat-card" style="grid-column: span 3">
-          <div class="stat-value" id="cmd-total">0 DA</div>
-          <div class="stat-label">Total des ventes</div>
-        </div>
-      </div>
-
-      <div class="section-title">Commandes récentes</div>
-      <div class="orders-list" id="orders-list">
-        <div style="text-align:center;color:var(--text-muted);padding:2rem;font-size:0.85rem;">
-          Aucune commande pour le moment
-        </div>
-      </div>
-    </section>
-
-    <!-- HISTORIQUE PAGE -->
-    <section class="page" id="page-history">
-      <div class="page-header">
-        <h2>📜 HISTORIQUE</h2>
-        <p>Journal des entrées et événements</p>
-      </div>
-
-      <div class="history-list" id="history-list">
-        <div style="text-align:center;color:var(--text-muted);padding:2rem;font-size:0.85rem;">
-          Aucun événement enregistré
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- BOTTOM NAV (ADMIN) -->
-  <nav class="bottom-nav" id="bottom-nav-admin" style="display:none">
-    <button class="nav-item active" onclick="switchPage('scanner', this)" id="nav-scanner">
-      <span class="nav-icon">📷</span>Scanner
-    </button>
-    <button class="nav-item" onclick="switchPage('zones', this)" id="nav-zones">
-      <span class="nav-icon">👥</span>ZONES
-    </button>
-    <button class="nav-item" onclick="switchPage('boutique', this)" id="nav-boutique">
-      <span class="nav-icon">🛍️</span>BOUTIQUE
-    </button>
-    <button class="nav-item" onclick="switchPage('commandes', this)" id="nav-commandes">
-      <span class="nav-icon">📋</span>COMMANDE
-    </button>
-    <button class="nav-item" onclick="switchPage('history', this)" id="nav-history">
-      <span class="nav-icon">📜</span>Historique
-    </button>
-  </nav>
-
-  <!-- BOTTOM NAV (USER) -->
-  <nav class="bottom-nav" id="bottom-nav-user" style="display:none">
-    <button class="nav-item active" onclick="switchPage('boutique', this)">
-      <span class="nav-icon">🛍️</span>BOUTIQUE
-    </button>
-  </nav>
-</div>
-
-<!-- ===== MODAL ===== -->
-<div class="modal-overlay" id="modal-jersey">
-  <div class="modal">
-    <div class="modal-title" id="modal-product-name">Maillot EL ASSIMA</div>
-    <div class="modal-sub">Choisissez une taille</div>
-    <div class="size-grid">
-      <button class="size-btn" onclick="selectSize('XS')" id="sz-XS">XS</button>
-      <button class="size-btn" onclick="selectSize('S')" id="sz-S">S</button>
-      <button class="size-btn" onclick="selectSize('M')" id="sz-M">M</button>
-      <button class="size-btn" onclick="selectSize('L')" id="sz-L">L</button>
-      <button class="size-btn" onclick="selectSize('XL')" id="sz-XL">XL</button>
-      <button class="size-btn" onclick="selectSize('XXL')" id="sz-XXL">XXL</button>
-      <button class="size-btn" onclick="selectSize('3XL')" id="sz-3XL">3XL</button>
-      <button class="size-btn" onclick="selectSize('4XL')" id="sz-4XL">4XL</button>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal()">Annuler</button>
-      <button class="btn-confirm" onclick="addToCart()">➕ Ajouter</button>
     </div>
   </div>
-</div>
 
-<!-- TOAST -->
-<div id="toast"></div>
+  <!-- TOAST -->
+  <div id="toast"></div>
 
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
-<script src="https://unpkg.com/html5-qrcode"></script>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+  <script src="https://unpkg.com/html5-qrcode"></script>
 
-<script>
-// Initialisation Firebase pour l'application EL ASSIMA
-const firebaseConfig = {
-  apiKey: "AIzaSyBgK8ZKmZ0N329vOTfpiAyYAhPu_mhyTAM",
-  appId: "1:179443689337:web:31ca73ac50811b286931a8",
-  messagingSenderId: "179443689337",
-  projectId: "app-10-1b5fd",
-  authDomain: "app-10-1b5fd.firebaseapp.com",
-  storageBucket: "app-10-1b5fd.firebasestorage.app",
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+  <script>
+    // Initialisation Firebase pour l'application EL ASSIMA
+    const firebaseConfig = {
+      apiKey: "AIzaSyBgK8ZKmZ0N329vOTfpiAyYAhPu_mhyTAM",
+      appId: "1:179443689337:web:31ca73ac50811b286931a8",
+      messagingSenderId: "179443689337",
+      projectId: "app-10-1b5fd",
+      authDomain: "app-10-1b5fd.firebaseapp.com",
+      storageBucket: "app-10-1b5fd.firebasestorage.app",
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-// ===== DATA =====
-let MEMBERS = [];
+    // ===== DATA =====
+    let MEMBERS = [];
 
-const PRODUCTS = [
-  { id: "j1", name: "Maillot Domicile 2025", type: "jersey", emoji: "👕", price: 3500, desc: "Maillot officiel rouge & blanc, saison 2025", isNew: true },
-  { id: "j2", name: "Maillot Extérieur 2025", type: "jersey", emoji: "⚫", price: 3500, desc: "Maillot déplacement noir, saison 2025", isNew: true },
-  { id: "j3", name: "Maillot 3eme Tenue", type: "jersey", emoji: "🔴", price: 3200, desc: "Édition spéciale supporter 2025" },
-  { id: "k1", name: "Porte-clé Logo EA", type: "keychain", emoji: "🔑", price: 500, desc: "Porte-clé métal avec logo officiel EA" },
-  { id: "k2", name: "Porte-clé Collector", type: "keychain", emoji: "⭐", price: 800, desc: "Édition limitée 2025, numéroté", isNew: true },
-  { id: "p1", name: "Pins", type: "pins", emoji: "📌", price: 500, desc: "Pins officiel" },
-  { id: "s1", name: "Stickers", type: "stickers", emoji: "🏷️", price: 300, desc: "Stickers officiels" },
-  { id: "b1", name: "Béret", type: "beret", emoji: "🧢", price: 3000, desc: "Béret officiel", isNew: true },
-];
+    const PRODUCTS = [
+      { id: "j1", name: "Maillot Domicile 2025", type: "jersey", emoji: "👕", price: 3500, desc: "Maillot officiel rouge & blanc, saison 2025", isNew: true },
+      { id: "j2", name: "Maillot Extérieur 2025", type: "jersey", emoji: "⚫", price: 3500, desc: "Maillot déplacement noir, saison 2025", isNew: true },
+      { id: "j3", name: "Maillot 3eme Tenue", type: "jersey", emoji: "🔴", price: 3200, desc: "Édition spéciale supporter 2025" },
+      { id: "k1", name: "Porte-clé Logo EA", type: "keychain", emoji: "🔑", price: 500, desc: "Porte-clé métal avec logo officiel EA" },
+      { id: "k2", name: "Porte-clé Collector", type: "keychain", emoji: "⭐", price: 800, desc: "Édition limitée 2025, numéroté", isNew: true },
+      { id: "p1", name: "Pins", type: "pins", emoji: "📌", price: 500, desc: "Pins officiel" },
+      { id: "s1", name: "Stickers", type: "stickers", emoji: "🏷️", price: 300, desc: "Stickers officiels" },
+      { id: "b1", name: "Béret", type: "beret", emoji: "🧢", price: 3000, desc: "Béret officiel", isNew: true },
+    ];
 
-let isAdmin = false;
-let currentZone = null;
-let cart = [];
-let orders = [];
-let history = [];
-let presentMembers = new Set();
-let selectedProduct = null;
-let selectedSize = null;
-let html5QrCode = null;
+    let isAdmin = false;
+    let currentZone = null;
+    let cart = [];
+    let orders = [];
+    let history = [];
+    let presentMembers = new Set();
+    let selectedProduct = null;
+    let selectedSize = null;
+    let html5QrCode = null;
 
-// Synchronisation en temps réel avec Firebase (MEMBRES)
-db.collection("members").onSnapshot((snapshot) => {
-  MEMBERS = [];
-  let newPresent = new Set();
-  
-  snapshot.forEach(doc => {
-    const data = doc.data();
-    MEMBERS.push({
-      id: doc.id,
-      name: data.name || "Inconnu",
-      zone: data.zone || 0,
-      is_present: data.is_present || false
+    // Synchronisation en temps réel avec Firebase (MEMBRES)
+    db.collection("members").onSnapshot((snapshot) => {
+      MEMBERS = [];
+      let newPresent = new Set();
+
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        MEMBERS.push({
+          id: doc.id,
+          name: data.name || "Inconnu",
+          zone: data.zone || 0,
+          is_present: data.is_present || false
+        });
+        if (data.is_present) {
+          newPresent.add(doc.id);
+        }
+      });
+
+      presentMembers = newPresent;
+
+      if (isAdmin) {
+        if (document.getElementById('page-zones').classList.contains('active')) initZones();
+        updateStats();
+      }
     });
-    if (data.is_present) {
-      newPresent.add(doc.id);
+
+    // ===== SPLASH =====
+    let progress = 0;
+    const splashInterval = setInterval(() => {
+      progress += (100 - progress) * 0.12;
+      document.getElementById('splash-fill').style.width = progress + '%';
+      if (progress > 98) {
+        clearInterval(splashInterval);
+        setTimeout(() => {
+          document.getElementById('login-screen').classList.remove('hidden');
+        }, 600);
+      }
+    }, 150);
+
+    // ===== AUTH =====
+    function checkPin() {
+      const pin = document.getElementById('pin-input').value;
+      const errorEl = document.getElementById('pin-error');
+      if (pin === '2020') {
+        isAdmin = true;
+        loginSuccess();
+      } else if (pin === '0101') {
+        isAdmin = false;
+        loginSuccess();
+      } else {
+        errorEl.textContent = '❌ Code incorrect. Veuillez réessayer.';
+        document.getElementById('pin-input').value = '';
+        setTimeout(() => errorEl.textContent = '', 3000);
+      }
     }
-  });
 
-  presentMembers = newPresent;
-  
-  if (isAdmin) {
-    if (document.getElementById('page-zones').classList.contains('active')) initZones();
-    updateStats();
-  }
-});
+    document.getElementById('pin-input').addEventListener('input', (e) => {
+      if (e.target.value.length === 4) checkPin();
+    });
 
-// ===== SPLASH =====
-let progress = 0;
-const splashInterval = setInterval(() => {
-  progress += (100 - progress) * 0.12;
-  document.getElementById('splash-fill').style.width = progress + '%';
-  if (progress > 98) {
-    clearInterval(splashInterval);
-    setTimeout(() => {
+    function loginSuccess() {
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('app').classList.add('visible');
+
+      if (isAdmin) {
+        document.getElementById('bottom-nav-admin').style.display = 'flex';
+        document.getElementById('bottom-nav-user').style.display = 'none';
+        initAdminView();
+      } else {
+        document.getElementById('bottom-nav-user').style.display = 'flex';
+        document.getElementById('bottom-nav-admin').style.display = 'none';
+        switchPage('boutique', null);
+      }
+
+      initProducts();
+      updateStats();
+      showToast('✅ Connecté avec succès!', 'success');
+    }
+
+    function logout() {
+      if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
+      document.getElementById('app').classList.remove('visible');
       document.getElementById('login-screen').classList.remove('hidden');
-    }, 600);
-  }
-}, 150);
+      document.getElementById('pin-input').value = '';
+      isAdmin = false;
+      cart = [];
+      updateCartUI();
+    }
 
-// ===== AUTH =====
-function checkPin() {
-  const pin = document.getElementById('pin-input').value;
-  const errorEl = document.getElementById('pin-error');
-  if (pin === '2020') {
-    isAdmin = true;
-    loginSuccess();
-  } else if (pin === '0101') {
-    isAdmin = false;
-    loginSuccess();
-  } else {
-    errorEl.textContent = '❌ Code incorrect. Veuillez réessayer.';
-    document.getElementById('pin-input').value = '';
-    setTimeout(() => errorEl.textContent = '', 3000);
-  }
-}
+    // ===== NAVIGATION =====
+    function switchPage(page, navEl) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
 
-document.getElementById('pin-input').addEventListener('input', (e) => {
-  if (e.target.value.length === 4) checkPin();
-});
+      document.getElementById('page-' + page)?.classList.add('active');
+      if (navEl) navEl.classList.add('active');
 
-function loginSuccess() {
-  document.getElementById('login-screen').classList.add('hidden');
-  document.getElementById('app').classList.add('visible');
+      if (page === 'zones') initZones();
+      if (page === 'commandes') updateOrdersPage();
+      if (page === 'history') renderHistory();
+    }
 
-  if (isAdmin) {
-    document.getElementById('bottom-nav-admin').style.display = 'flex';
-    document.getElementById('bottom-nav-user').style.display = 'none';
-    initAdminView();
-  } else {
-    document.getElementById('bottom-nav-user').style.display = 'flex';
-    document.getElementById('bottom-nav-admin').style.display = 'none';
-    switchPage('boutique', null);
-  }
+    function showOrders() {
+      switchPage('commandes', document.getElementById('nav-commandes'));
+    }
 
-  initProducts();
-  updateStats();
-  showToast('✅ Connecté avec succès!', 'success');
-}
+    // ===== ADMIN INIT =====
+    function initAdminView() {
+      updateStats();
+    }
 
-function logout() {
-  if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
-  document.getElementById('app').classList.remove('visible');
-  document.getElementById('login-screen').classList.remove('hidden');
-  document.getElementById('pin-input').value = '';
-  isAdmin = false;
-  cart = [];
-  updateCartUI();
-}
+    // ===== ZONES =====
+    function initZones() {
+      const grid = document.getElementById('zones-grid');
+      grid.innerHTML = '';
 
-// ===== NAVIGATION =====
-function switchPage(page, navEl) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      // Toujours afficher les zones 1 à 14
+      for (let z = 1; z <= 14; z++) {
+        const zoneMembers = MEMBERS.filter(m => parseInt(m.zone) === z);
+        const count = zoneMembers.length;
+        const present = zoneMembers.filter(m => presentMembers.has(m.id)).length;
 
-  document.getElementById('page-' + page)?.classList.add('active');
-  if (navEl) navEl.classList.add('active');
+        const card = document.createElement('div');
+        card.className = 'zone-card' + (currentZone === z ? ' active' : '');
+        card.innerHTML = `
+      <div class="zone-num">${z}</div>
+      <div class="zone-label">Zone ${z}</div>
+      <div class="zone-count">${present}/${count}</div>
+      <div style="width:100%; height:3px; background:rgba(255,255,255,0.05); border-radius:10px; margin-top:5px; overflow:hidden">
+        <div style="width:${count > 0 ? (present / count) * 100 : 0}%; height:100%; background:var(--red)"></div>
+      </div>
+    `;
+        card.onclick = () => { currentZone = z; initZones(); renderMembers(z); };
+        grid.appendChild(card);
+      }
 
-  if (page === 'zones') initZones();
-  if (page === 'commandes') updateOrdersPage();
-  if (page === 'history') renderHistory();
-}
+      // Mise à jour du résumé global
+      document.getElementById('summary-total-res').textContent = MEMBERS.length;
+      document.getElementById('summary-present-res').textContent = presentMembers.size;
 
-function showOrders() {
-  switchPage('commandes', document.getElementById('nav-commandes'));
-}
+      if (currentZone) renderMembers(currentZone);
+    }
 
-// ===== ADMIN INIT =====
-function initAdminView() {
-  updateStats();
-}
-
-// ===== ZONES =====
-function initZones() {
-  const zones = [...new Set(MEMBERS.map(m => m.zone))].sort((a, b) => a - b);
-  const grid = document.getElementById('zones-grid');
-  grid.innerHTML = '';
-  zones.forEach(z => {
-    const count = MEMBERS.filter(m => m.zone === z).length;
-    const present = MEMBERS.filter(m => m.zone === z && presentMembers.has(m.id)).length;
-    const card = document.createElement('div');
-    card.className = 'zone-card' + (currentZone === z ? ' active' : '');
-    card.innerHTML = `<div class="zone-num">${z}</div><div class="zone-label">Zone ${z}</div><div class="zone-count">${present}/${count} présents</div>`;
-    card.onclick = () => { currentZone = z; initZones(); renderMembers(z); };
-    grid.appendChild(card);
-  });
-  if (currentZone) renderMembers(currentZone);
-}
-
-function renderMembers(zone) {
-  const list = document.getElementById('members-list');
-  const members = MEMBERS.filter(m => m.zone === zone);
-  list.innerHTML = `<div class="section-title">Zone ${zone} — ${members.length} membres</div>`;
-  members.forEach(m => {
-    const isPresent = presentMembers.has(m.id);
-    const card = document.createElement('div');
-    card.className = 'member-card';
-    card.innerHTML = `
+    function renderMembers(zone) {
+      const list = document.getElementById('members-list');
+      const members = MEMBERS.filter(m => m.zone === zone);
+      list.innerHTML = `<div class="section-title">Zone ${zone} — ${members.length} membres</div>`;
+      members.forEach(m => {
+        const isPresent = presentMembers.has(m.id);
+        const card = document.createElement('div');
+        card.className = 'member-card';
+        card.innerHTML = `
       <div class="member-avatar">${m.name.charAt(0)}</div>
       <div class="member-info">
         <div class="member-name">${m.name}</div>
@@ -1303,129 +1959,129 @@ function renderMembers(zone) {
       </div>
       <span class="member-badge ${isPresent ? 'badge-present' : 'badge-absent'}">${isPresent ? '✅ Présent' : '—'}</span>
     `;
-    list.appendChild(card);
-  });
-}
-
-// ===== SCANNER =====
-function searchMember() {
-  const query = document.getElementById('search-id').value.trim().toUpperCase();
-  const resultEl = document.getElementById('scan-result');
-  if (!query) return;
-
-  const member = MEMBERS.find(m =>
-    m.id.toUpperCase() === query ||
-    m.name.toUpperCase().includes(query)
-  );
-
-  if (member) {
-    const alreadyPresent = presentMembers.has(member.id);
-    if (!alreadyPresent) {
-      presentMembers.add(member.id);
-      addHistory(`Entrée validée — ${member.name}`, 'success', `Zone ${member.zone}`);
-      updateStats();
-      // Sync avec Firebase
-      db.collection("members").doc(member.id).update({ is_present: true }).catch(e => console.error("Erreur Firebase:", e));
+        list.appendChild(card);
+      });
     }
-    resultEl.className = 'scan-result visible success';
-    resultEl.innerHTML = `
+
+    // ===== SCANNER =====
+    function searchMember() {
+      const query = document.getElementById('search-id').value.trim().toUpperCase();
+      const resultEl = document.getElementById('scan-result');
+      if (!query) return;
+
+      const member = MEMBERS.find(m =>
+        m.id.toUpperCase() === query ||
+        m.name.toUpperCase().includes(query)
+      );
+
+      if (member) {
+        const alreadyPresent = presentMembers.has(member.id);
+        if (!alreadyPresent) {
+          presentMembers.add(member.id);
+          addHistory(`Entrée validée — ${member.name}`, 'success', `Zone ${member.zone}`);
+          updateStats();
+          // Sync avec Firebase
+          db.collection("members").doc(member.id).update({ is_present: true }).catch(e => console.error("Erreur Firebase:", e));
+        }
+        resultEl.className = 'scan-result visible success';
+        resultEl.innerHTML = `
       <div class="result-badge success">✅ ${alreadyPresent ? 'DÉJÀ ENREGISTRÉ' : 'ACCÈS AUTORISÉ'}</div>
       <div class="result-name">${member.name}</div>
       <div class="result-id">${member.id}</div>
       <div class="result-zone">Zone ${member.zone}</div>
     `;
-    showToast(alreadyPresent ? '⚠️ Déjà enregistré' : '✅ Accès autorisé!', 'success');
-  } else {
-    resultEl.className = 'scan-result visible error';
-    resultEl.innerHTML = `
+        showToast(alreadyPresent ? '⚠️ Déjà enregistré' : '✅ Accès autorisé!', 'success');
+      } else {
+        resultEl.className = 'scan-result visible error';
+        resultEl.innerHTML = `
       <div class="result-badge error">❌ REFUSÉ</div>
       <div class="result-msg">Aucun membre trouvé pour : "${query}"</div>
     `;
-    addHistory(`Tentative refusée — ${query}`, 'error', '');
-    showToast('❌ Membre non trouvé', 'error');
-  }
-}
-
-function updateStats() {
-  document.getElementById('stat-present').textContent = presentMembers.size;
-  document.getElementById('stat-total').textContent = MEMBERS.length;
-}
-
-// ===== CAMERA/SCANNER =====
-async function toggleCamera() {
-  const btn = document.getElementById('btn-toggle-cam');
-  const placeholder = document.getElementById('camera-placeholder');
-  const readerId = "camera-view";
-
-  if (html5QrCode && html5QrCode.isScanning) {
-    stopScanner();
-    return;
-  }
-
-  placeholder.style.display = 'none';
-  btn.textContent = '⏹ ARRÊTER LE SCAN';
-  showToast('🔍 Recherche de la caméra...', 'success');
-
-  html5QrCode = new Html5Qrcode(readerId);
-  const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-
-  try {
-    await html5QrCode.start(
-      { facingMode: "environment" }, 
-      config,
-      (decodedText) => {
-        // Succès du scan
-        document.getElementById('search-id').value = decodedText;
-        searchMember();
-        // Optionnel: On peut arrêter le scan après un succès ou continuer
-        // stopScanner(); 
-      },
-      (errorMessage) => {
-        // Erreurs de lecture silencieuses (normal tant qu'on n'a pas fini de scanner)
+        addHistory(`Tentative refusée — ${query}`, 'error', '');
+        showToast('❌ Membre non trouvé', 'error');
       }
-    );
-    showToast('✅ Scanner actif', 'success');
-  } catch (err) {
-    console.error("Erreur Scanner:", err);
-    placeholder.style.display = 'flex';
-    btn.textContent = '🎥 ACTIVER CAMÉRA';
-    showToast('❌ Erreur caméra', 'error');
-  }
-}
+    }
 
-function stopScanner() {
-  if (html5QrCode) {
-    html5QrCode.stop().then(() => {
-      document.getElementById('camera-placeholder').style.display = 'flex';
-      document.getElementById('btn-toggle-cam').textContent = '🎥 ACTIVER CAMÉRA';
-      showToast('📷 Scanner arrêté');
-    }).catch(err => console.error(err));
-  }
-}
+    function updateStats() {
+      document.getElementById('stat-present').textContent = presentMembers.size;
+      document.getElementById('stat-total').textContent = MEMBERS.length;
+    }
 
-function logout() {
-  if (html5QrCode && html5QrCode.isScanning) {
-    stopScanner();
-  }
-  document.getElementById('app').classList.remove('visible');
-  document.getElementById('login-screen').classList.remove('hidden');
-  document.getElementById('pin-input').value = '';
-  isAdmin = false;
-  cart = [];
-  updateCartUI();
-}
+    // ===== CAMERA/SCANNER =====
+    async function toggleCamera() {
+      const btn = document.getElementById('btn-toggle-cam');
+      const placeholder = document.getElementById('camera-placeholder');
+      const readerId = "camera-view";
 
-// ===== PRODUCTS =====
-function initProducts() {
-  const jerseys = PRODUCTS.filter(p => p.type === 'jersey');
-  const access = PRODUCTS.filter(p => p.type !== 'jersey');
+      if (html5QrCode && html5QrCode.isScanning) {
+        stopScanner();
+        return;
+      }
 
-  document.getElementById('jerseys-grid').innerHTML = jerseys.map(p => productCard(p)).join('');
-  document.getElementById('access-grid').innerHTML = access.map(p => productCard(p)).join('');
-}
+      placeholder.style.display = 'none';
+      btn.textContent = '⏹ ARRÊTER LE SCAN';
+      showToast('🔍 Recherche de la caméra...', 'success');
 
-function productCard(p) {
-  return `
+      html5QrCode = new Html5Qrcode(readerId);
+      const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+      try {
+        await html5QrCode.start(
+          { facingMode: "environment" },
+          config,
+          (decodedText) => {
+            // Succès du scan
+            document.getElementById('search-id').value = decodedText;
+            searchMember();
+            // Optionnel: On peut arrêter le scan après un succès ou continuer
+            // stopScanner(); 
+          },
+          (errorMessage) => {
+            // Erreurs de lecture silencieuses (normal tant qu'on n'a pas fini de scanner)
+          }
+        );
+        showToast('✅ Scanner actif', 'success');
+      } catch (err) {
+        console.error("Erreur Scanner:", err);
+        placeholder.style.display = 'flex';
+        btn.textContent = '🎥 ACTIVER CAMÉRA';
+        showToast('❌ Erreur caméra', 'error');
+      }
+    }
+
+    function stopScanner() {
+      if (html5QrCode) {
+        html5QrCode.stop().then(() => {
+          document.getElementById('camera-placeholder').style.display = 'flex';
+          document.getElementById('btn-toggle-cam').textContent = '🎥 ACTIVER CAMÉRA';
+          showToast('📷 Scanner arrêté');
+        }).catch(err => console.error(err));
+      }
+    }
+
+    function logout() {
+      if (html5QrCode && html5QrCode.isScanning) {
+        stopScanner();
+      }
+      document.getElementById('app').classList.remove('visible');
+      document.getElementById('login-screen').classList.remove('hidden');
+      document.getElementById('pin-input').value = '';
+      isAdmin = false;
+      cart = [];
+      updateCartUI();
+    }
+
+    // ===== PRODUCTS =====
+    function initProducts() {
+      const jerseys = PRODUCTS.filter(p => p.type === 'jersey');
+      const access = PRODUCTS.filter(p => p.type !== 'jersey');
+
+      document.getElementById('jerseys-grid').innerHTML = jerseys.map(p => productCard(p)).join('');
+      document.getElementById('access-grid').innerHTML = access.map(p => productCard(p)).join('');
+    }
+
+    function productCard(p) {
+      return `
     <div class="product-card" onclick="openProductModal('${p.id}')">
       <div class="product-img">
         ${p.isNew ? '<span class="product-badge-new">NOUVEAU</span>' : ''}
@@ -1439,98 +2095,122 @@ function productCard(p) {
       </div>
     </div>
   `;
-}
+    }
 
-function openProductModal(productId) {
-  selectedProduct = PRODUCTS.find(p => p.id === productId);
-  selectedSize = null;
-  document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('modal-product-name').textContent = selectedProduct.name;
+    function openProductModal(productId) {
+      selectedProduct = PRODUCTS.find(p => p.id === productId);
+      selectedSize = null;
+      document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('modal-product-name').textContent = selectedProduct.name;
 
-  const isJersey = selectedProduct.type === 'jersey';
-  document.querySelector('.size-grid').style.display = isJersey ? 'grid' : 'none';
-  document.querySelector('.modal-sub').textContent = isJersey ? 'Choisissez une taille' : 'Confirmer la commande ?';
-  if (!isJersey) selectedSize = 'N/A';
+      // Reset form
+      document.getElementById('order-firstname').value = '';
+      document.getElementById('order-lastname').value = '';
+      document.getElementById('order-zone').value = '';
 
-  document.getElementById('modal-jersey').classList.add('visible');
-}
+      const isJersey = selectedProduct.type === 'jersey';
+      document.getElementById('modal-size-selector').style.display = isJersey ? 'grid' : 'none';
+      if (!isJersey) selectedSize = 'N/A';
 
-function selectSize(size) {
-  selectedSize = size;
-  document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('sz-' + size).classList.add('active');
-}
+      document.getElementById('modal-jersey').classList.add('visible');
+    }
 
-function closeModal() {
-  document.getElementById('modal-jersey').classList.remove('visible');
-  selectedProduct = null; selectedSize = null;
-}
+    function selectSize(size) {
+      selectedSize = size;
+      document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('sz-' + size).classList.add('active');
+    }
 
-function addToCart() {
-  if (!selectedProduct) return;
-  if (selectedProduct.type === 'jersey' && !selectedSize) {
-    showToast('⚠️ Choisissez une taille', 'error');
-    return;
-  }
+    function closeModal() {
+      document.getElementById('modal-jersey').classList.remove('visible');
+      selectedProduct = null; selectedSize = null;
+    }
 
-  // Envoi direct de la commande vers Firebase
-  const orderId = selectedProduct.type === 'jersey' ? "WEB_MAILLOT_" + Date.now() : "WEB_KEY_" + Date.now();
-  db.collection("orders").doc(orderId).set({
-    product: selectedProduct.name,
-    size: selectedSize || "N/A",
-    quantity: 1,
-    price: selectedProduct.price,
-    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-    status: 'En attente'
-  }).then(() => {
-    cart.push({ ...selectedProduct, size: selectedSize, qty: 1 });
-    closeModal();
-    updateCartUI();
-    showToast(`✅ ${selectedProduct.name} commandé avec succès`, 'success');
-  }).catch(e => {
-    showToast('❌ Erreur de réseau Firebase', 'error');
-    console.error(e);
-  });
-}
+    function addToCart() {
+      if (!selectedProduct) return;
 
-function updateCartUI() {
-  const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
-  const countEl = document.getElementById('cart-count');
-  const totalEl = document.getElementById('cart-total-display');
-  const indicator = document.getElementById('cart-indicator');
+      const firstName = document.getElementById('order-firstname').value.trim();
+      const lastName = document.getElementById('order-lastname').value.trim();
+      const zone = document.getElementById('order-zone').value;
 
-  if (cart.length > 0) {
-    indicator.style.display = 'flex';
-    countEl.textContent = cart.length + ' article(s)';
-    totalEl.textContent = total.toLocaleString() + ' DA';
-  } else {
-    indicator.style.display = 'none';
-  }
-}
+      if (!firstName || !lastName || !zone) {
+        showToast('⚠️ Complétez Nom, Prénom et Zone', 'error');
+        return;
+      }
 
-// ===== ORDERS PAGE =====
-function updateOrdersPage() {
-  const jerseyCount = cart.filter(i => i.type === 'jersey').length;
-  const keyCount = cart.filter(i => i.type === 'keychain').length;
-  const pinsCount = cart.filter(i => i.type === 'pins').length;
-  const stickersCount = cart.filter(i => i.type === 'stickers').length;
-  const beretCount = cart.filter(i => i.type === 'beret').length;
-  const totalAmount = cart.reduce((s, i) => s + i.price * i.qty, 0);
+      if (selectedProduct.type === 'jersey' && !selectedSize) {
+        showToast('⚠️ Choisissez une taille', 'error');
+        return;
+      }
 
-  document.getElementById('cmd-jerseys').textContent = jerseyCount;
-  document.getElementById('cmd-keys').textContent = keyCount;
-  document.getElementById('cmd-pins').textContent = pinsCount;
-  document.getElementById('cmd-stickers').textContent = stickersCount;
-  document.getElementById('cmd-beret').textContent = beretCount;
-  document.getElementById('cmd-total').textContent = totalAmount.toLocaleString() + ' DA';
+      // Envoi direct de la commande vers Firebase avec Infos Client
+      const orderId = "CMD_" + Date.now();
+      db.collection("orders").doc(orderId).set({
+        client: `${firstName} ${lastName}`,
+        firstName: firstName,
+        lastName: lastName,
+        zone: zone,
+        product: selectedProduct.name,
+        size: selectedSize || "N/A",
+        quantity: 1,
+        price: selectedProduct.price,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        status: 'En attente'
+      }).then(() => {
+        cart.push({
+          ...selectedProduct,
+          client: `${firstName} ${lastName}`,
+          zone: zone,
+          size: selectedSize,
+          qty: 1
+        });
+        closeModal();
+        updateCartUI();
+        showToast(`✅ Commande pour ${firstName} validée`, 'success');
+      }).catch(e => {
+        showToast('❌ Erreur de réseau Firebase', 'error');
+        console.error(e);
+      });
+    }
 
-  const list = document.getElementById('orders-list');
-  if (cart.length === 0) {
-    list.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:2rem;font-size:0.85rem;">Aucune commande pour le moment</div>';
-    return;
-  }
+    function updateCartUI() {
+      const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+      const countEl = document.getElementById('cart-count');
+      const totalEl = document.getElementById('cart-total-display');
+      const indicator = document.getElementById('cart-indicator');
 
-  list.innerHTML = cart.map((item, i) => `
+      if (cart.length > 0) {
+        indicator.style.display = 'flex';
+        countEl.textContent = cart.length + ' article(s)';
+        totalEl.textContent = total.toLocaleString() + ' DA';
+      } else {
+        indicator.style.display = 'none';
+      }
+    }
+
+    // ===== ORDERS PAGE =====
+    function updateOrdersPage() {
+      const jerseyCount = cart.filter(i => i.type === 'jersey').length;
+      const keyCount = cart.filter(i => i.type === 'keychain').length;
+      const pinsCount = cart.filter(i => i.type === 'pins').length;
+      const stickersCount = cart.filter(i => i.type === 'stickers').length;
+      const beretCount = cart.filter(i => i.type === 'beret').length;
+      const totalAmount = cart.reduce((s, i) => s + i.price * i.qty, 0);
+
+      document.getElementById('cmd-jerseys').textContent = jerseyCount;
+      document.getElementById('cmd-keys').textContent = keyCount;
+      document.getElementById('cmd-pins').textContent = pinsCount;
+      document.getElementById('cmd-stickers').textContent = stickersCount;
+      document.getElementById('cmd-beret').textContent = beretCount;
+      document.getElementById('cmd-total').textContent = totalAmount.toLocaleString() + ' DA';
+
+      const list = document.getElementById('orders-list');
+      if (cart.length === 0) {
+        list.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:2rem;font-size:0.85rem;">Aucune commande pour le moment</div>';
+        return;
+      }
+
+      list.innerHTML = cart.map((item, i) => `
     <div class="order-card">
       <div class="order-header">
         <div class="order-name">${item.emoji} ${item.name}</div>
@@ -1539,22 +2219,22 @@ function updateOrdersPage() {
       <div class="order-items">${item.size !== 'N/A' ? 'Taille : ' + item.size : 'Accessoire'} • Qté : ${item.qty}</div>
     </div>
   `).join('');
-}
+    }
 
-// ===== HISTORY =====
-function addHistory(event, type, zone) {
-  const now = new Date();
-  history.unshift({ event, type, zone, time: now.toLocaleTimeString('fr-FR') });
-  if (history.length > 50) history.pop();
-}
+    // ===== HISTORY =====
+    function addHistory(event, type, zone) {
+      const now = new Date();
+      history.unshift({ event, type, zone, time: now.toLocaleTimeString('fr-FR') });
+      if (history.length > 50) history.pop();
+    }
 
-function renderHistory() {
-  const list = document.getElementById('history-list');
-  if (history.length === 0) {
-    list.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:2rem;font-size:0.85rem;">Aucun événement enregistré</div>';
-    return;
-  }
-  list.innerHTML = history.map(h => `
+    function renderHistory() {
+      const list = document.getElementById('history-list');
+      if (history.length === 0) {
+        list.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:2rem;font-size:0.85rem;">Aucun événement enregistré</div>';
+        return;
+      }
+      list.innerHTML = history.map(h => `
     <div class="history-card">
       <div class="history-dot ${h.type}"></div>
       <div class="history-info">
@@ -1563,27 +2243,28 @@ function renderHistory() {
       </div>
     </div>
   `).join('');
-}
+    }
 
-// ===== TOAST =====
-let toastTimeout;
-function showToast(msg, type = '') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'show ' + type;
-  clearTimeout(toastTimeout);
-  toastTimeout = setTimeout(() => t.className = '', 2500);
-}
+    // ===== TOAST =====
+    let toastTimeout;
+    function showToast(msg, type = '') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'show ' + type;
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => t.className = '', 2500);
+    }
 
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').then(registration => {
-      console.log('ServiceWorker registration successful with scope: ', registration.scope);
-    }).catch(err => {
-      console.log('ServiceWorker registration failed: ', err);
-    });
-  });
-}
-</script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').then(registration => {
+          console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        }).catch(err => {
+          console.log('ServiceWorker registration failed: ', err);
+        });
+      });
+    }
+  </script>
 </body>
+
 </html>
